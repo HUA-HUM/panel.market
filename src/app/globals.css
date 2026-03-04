@@ -73,3 +73,10 @@ body {
 .animate-spin-reverse {
   animation: spinReverse 60s linear infinite;
 }
+.recharts-wrapper:focus {
+  outline: none;
+}
+
+.recharts-surface:focus {
+  outline: none;
+}
