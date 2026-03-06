@@ -153,15 +153,14 @@ export default function ProductsAnalyticsPanel() {
           onChange={(v) => updateFilter('maxPrice', v)}
         />
 
-        <RangeDoubleInput
-          label="Rango de visitas"
-          minValue={filters.minVisits}
-          maxValue={filters.maxVisits}
-          onChange={({ min, max }) => {
-            updateFilter('minVisits', min);
-            updateFilter('maxVisits', max);
-          }}
-        />
+        <VisitsRange
+  min={filters.minVisits}
+  max={filters.maxVisits}
+  onChange={({ min, max }) => {
+    updateFilter('minVisits', min);
+    updateFilter('maxVisits', max);
+  }}
+/>
 
         <NumberInput
           label="Órdenes mínimas"
@@ -199,7 +198,15 @@ export default function ProductsAnalyticsPanel() {
       </div>
 
       {/* ================= ACTIONS ================= */}
-
+<ActiveFilters
+  filters={filters}
+  onRemove={(key) =>
+    setFilters((prev) => ({
+      ...prev,
+      [key]: undefined,
+    }))
+  }
+/>
       <div className="flex gap-4">
         <button
           onClick={handleApplyFilters}
@@ -452,110 +459,115 @@ function MarketplaceStatusSelector({
   );
 }
 
-type RangeDoubleInputProps = {
-  label: string;
-  minValue?: number;
-  maxValue?: number;
+type VisitsRangeProps = {
+  min?: number;
+  max?: number;
   onChange: (values: { min?: number; max?: number }) => void;
 };
 
-function RangeDoubleInput({
-  label,
-  minValue,
-  maxValue,
-  onChange,
-}: RangeDoubleInputProps) {
+function VisitsRange({ min, max, onChange }: VisitsRangeProps) {
+  return (
+    <div className="flex flex-col justify-end h-[88px]">
+      <label className="text-sm text-zinc-400 mb-2">
+        Rango de visitas
+      </label>
 
-  const MIN = 0;
-  const MAX = 1000;
+      <div className="flex gap-2">
+        <input
+          type="number"
+          placeholder="Min"
+          value={min ?? ''}
+          className="w-full h-10 px-3 bg-zinc-800 rounded-lg border border-zinc-700 focus:ring-2 focus:ring-blue-600"
+          onChange={(e) =>
+            onChange({
+              min: e.target.value ? Number(e.target.value) : undefined,
+              max,
+            })
+          }
+        />
 
-  const currentMin = minValue ?? MIN;
-  const currentMax = maxValue ?? MAX;
+        <input
+          type="number"
+          placeholder="Max"
+          value={max ?? ''}
+          className="w-full h-10 px-3 bg-zinc-800 rounded-lg border border-zinc-700 focus:ring-2 focus:ring-blue-600"
+          onChange={(e) =>
+            onChange({
+              min,
+              max: e.target.value ? Number(e.target.value) : undefined,
+            })
+          }
+        />
+      </div>
+    </div>
+  );
+}
 
-  const percentMin = ((currentMin - MIN) / (MAX - MIN)) * 100;
-  const percentMax = ((currentMax - MIN) / (MAX - MIN)) * 100;
+type ActiveFiltersProps = {
+  filters: ProductsFilters;
+  onRemove: (key: keyof ProductsFilters) => void;
+};
 
-  const handleMinChange = (value: number) => {
-    const newMin = Math.min(value, currentMax - 1);
-    onChange({ min: newMin, max: currentMax });
-  };
+function ActiveFilters({ filters, onRemove }: ActiveFiltersProps) {
+  const items: { label: string; key: keyof ProductsFilters }[] = [];
 
-  const handleMaxChange = (value: number) => {
-    const newMax = Math.max(value, currentMin + 1);
-    onChange({ min: currentMin, max: newMax });
-  };
+  if (filters.brand) items.push({ label: `Marca: ${filters.brand}`, key: 'brand' });
 
-  const clear = () => {
-    onChange({ min: undefined, max: undefined });
-  };
+  if (filters.categoryId)
+    items.push({ label: `Categoría: ${filters.categoryId}`, key: 'categoryId' });
+
+  if (filters.marketplaceStatus)
+    items.push({
+      label:
+        filters.marketplaceStatus === 'published'
+          ? 'Marketplace: Publicado'
+          : 'Marketplace: No publicado',
+      key: 'marketplaceStatus',
+    });
+
+  if (filters.minPrice || filters.maxPrice)
+    items.push({
+      label: `Precio: ${filters.minPrice ?? 0} - ${filters.maxPrice ?? '∞'}`,
+      key: 'minPrice',
+    });
+
+  if (filters.minVisits || filters.maxVisits)
+    items.push({
+      label: `Visitas: ${filters.minVisits ?? 0} - ${filters.maxVisits ?? '∞'}`,
+      key: 'minVisits',
+    });
+
+  if (filters.status)
+    items.push({
+      label: `Estado: ${filters.status}`,
+      key: 'status',
+    });
+
+  if (filters.excludeMarketplace?.length)
+    items.push({
+      label: `Excluye: ${filters.excludeMarketplace.join(', ')}`,
+      key: 'excludeMarketplace',
+    });
+
+  if (items.length === 0) return null;
 
   return (
-    <div className="flex flex-col justify-end h-[110px]">
-      <div className="flex justify-between text-sm text-zinc-400 mb-3">
-        <span>{label}</span>
-        <span className="text-white font-medium">
-          {minValue !== undefined || maxValue !== undefined
-            ? `${currentMin} - ${currentMax}`
-            : '—'}
-        </span>
-      </div>
-
-      <div className="relative h-6">
-
-        {/* Track base */}
-        <div className="absolute top-1/2 -translate-y-1/2 w-full h-1 bg-zinc-700 rounded-full" />
-
-        {/* Selected range */}
+    <div className="flex flex-wrap gap-2 mb-6">
+      {items.map((item) => (
         <div
-          className="absolute top-1/2 -translate-y-1/2 h-1 bg-white rounded-full"
-          style={{
-            left: `${percentMin}%`,
-            width: `${percentMax - percentMin}%`,
-          }}
-        />
-
-        {/* MIN slider */}
-        <input
-          type="range"
-          min={MIN}
-          max={MAX}
-          value={currentMin}
-          onChange={(e) => handleMinChange(Number(e.target.value))}
-          className="absolute w-full h-6 bg-transparent appearance-none pointer-events-auto z-30
-                     [&::-webkit-slider-thumb]:appearance-none
-                     [&::-webkit-slider-thumb]:h-4
-                     [&::-webkit-slider-thumb]:w-4
-                     [&::-webkit-slider-thumb]:rounded-full
-                     [&::-webkit-slider-thumb]:bg-white
-                     [&::-webkit-slider-thumb]:cursor-pointer"
-        />
-
-        {/* MAX slider */}
-        <input
-          type="range"
-          min={MIN}
-          max={MAX}
-          value={currentMax}
-          onChange={(e) => handleMaxChange(Number(e.target.value))}
-          className="absolute w-full h-6 bg-transparent appearance-none pointer-events-auto z-20
-                     [&::-webkit-slider-thumb]:appearance-none
-                     [&::-webkit-slider-thumb]:h-4
-                     [&::-webkit-slider-thumb]:w-4
-                     [&::-webkit-slider-thumb]:rounded-full
-                     [&::-webkit-slider-thumb]:bg-white
-                     [&::-webkit-slider-thumb]:cursor-pointer"
-        />
-      </div>
-
-      {(minValue !== undefined || maxValue !== undefined) && (
-        <button
-          type="button"
-          onClick={clear}
-          className="text-xs text-zinc-400 hover:text-white mt-3 transition"
+          key={item.label}
+          className="flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-800 text-sm text-zinc-300 border border-zinc-700"
         >
-          Limpiar
-        </button>
-      )}
+          {item.label}
+
+          <button
+            onClick={() => onRemove(item.key)}
+            className="text-zinc-400 hover:text-white"
+          >
+            ✕
+          </button>
+        </div>
+      ))}
     </div>
   );
 }

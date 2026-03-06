@@ -3,7 +3,6 @@ export type ProductsOverview = {
   totalOrders: number;
   totalVisits: number;
   totalRevenue: number;
-
   avgPrice: number;
   avgTicket: number;
 };
