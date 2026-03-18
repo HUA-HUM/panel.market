@@ -17,4 +17,5 @@ export type ProductsFilters = {
   marketplaceStatus?: 'published' | 'not_published';
 
   status?: 'active' | 'paused' | 'closed' | 'under_review'; 
+  matchedMarketplace?: 'megatone' | 'fravega';
 };
