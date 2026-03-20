@@ -28,111 +28,69 @@ export function ImportProductsAction({ marketplace }: Props) {
 
   return (
     <div className="space-y-6">
-
-      {/* ================= ACTION CARD ================= */}
-      <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-
+      <div className="rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.03))] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
         <div className="flex items-center justify-between">
-
-          {/* Title + help */}
           <div className="flex items-center gap-2">
-
-            <h3 className="text-sm font-semibold text-gray-900">
-              Importar productos
+            <h3 className="text-sm font-semibold text-white">
+              Import products
             </h3>
-
-            {/* HELP TOOLTIP */}
             <div className="relative group">
-
-              <div className="flex h-5 w-5 items-center justify-center rounded-full bg-gray-200 text-xs font-semibold text-gray-600 cursor-default">
+              <div className="flex h-5 w-5 cursor-default items-center justify-center rounded-full bg-white/[0.08] text-xs font-semibold text-zinc-300">
                 ?
               </div>
-
-              <div className="pointer-events-none absolute left-1/2 top-7 w-72 -translate-x-1/2 rounded-lg border border-gray-200 bg-white p-3 text-xs text-gray-600 shadow-lg opacity-0 transition group-hover:opacity-100">
-
-                Este proceso sincroniza los productos directamente
-                desde el marketplace hacia nuestra plataforma.
-
-                <div className="mt-2 text-gray-500">
-                  Se descargan publicaciones, stock, precios y
-                  demás información disponible para mantener el
-                  catálogo actualizado.
-                </div>
-
+              <div className="pointer-events-none absolute left-1/2 top-7 z-10 w-72 -translate-x-1/2 rounded-xl border border-white/10 bg-[#0b1020] p-3 text-xs text-zinc-300 shadow-2xl opacity-0 transition group-hover:opacity-100">
+                Pulls products, stock, pricing, and available marketplace data into the platform.
               </div>
-
             </div>
-
           </div>
-
-          {/* BUTTON */}
           <button
             onClick={runImport}
             disabled={isImportRunning}
             className={`
-              rounded-lg px-4 py-2 text-sm font-medium transition
+              rounded-xl px-4 py-2 text-sm font-medium transition
               ${
                 isImportRunning
-                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  : 'bg-black text-white hover:bg-gray-900'
+                  ? 'cursor-not-allowed bg-white/[0.08] text-zinc-500'
+                  : 'border border-cyan-300/20 bg-[linear-gradient(135deg,#67e8f9,#2563eb,#0f172a)] text-white'
               }
             `}
           >
-            {isImportRunning ? 'Importando…' : 'Ejecutar import'}
+            {isImportRunning ? 'Importing...' : 'Run import'}
           </button>
-
         </div>
-
       </div>
 
-      {/* ================= LOADING ================= */}
-
       {isImportRunning && !latestRun && (
-        <div className="flex items-center gap-3 text-sm text-gray-700">
-
+        <div className="flex items-center gap-3 text-sm text-zinc-300">
           <BrandSpinner size={18} />
-
-          <span>Inicializando importación…</span>
-
+          <span>Initializing import...</span>
         </div>
       )}
-
-      {/* ================= RUNNING ================= */}
 
       {(latestRun?.status === 'STARTED' ||
         latestRun?.status === 'RUNNING') && (
-        <div className="flex items-center gap-3 text-sm text-gray-700">
-
+        <div className="flex items-center gap-3 text-sm text-zinc-300">
           <BrandSpinner size={18} />
-
-          <span>Importación en progreso…</span>
-
+          <span>Import in progress...</span>
         </div>
       )}
 
-      {/* ================= RUN LIST ================= */}
-
       {runs.length > 0 && (
         <div className="space-y-3">
-
           {runs.map(run => (
             <ImportProductsProgress
               key={run.id}
               run={run}
             />
           ))}
-
         </div>
       )}
 
-      {/* ================= ERROR ================= */}
-
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+        <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-200">
           {error}
         </div>
       )}
-
     </div>
   );
 }

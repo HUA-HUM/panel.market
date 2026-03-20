@@ -21,7 +21,7 @@ export function MarketplaceProductCard({ product }: Props) {
     .trim();
 
   let statusBadge =
-    'bg-gray-100 text-gray-600';
+    'bg-white/[0.08] text-zinc-300';
 
   let statusLabel = normalizedStatus ?? 'Desconocido';
 
@@ -49,18 +49,11 @@ export function MarketplaceProductCard({ product }: Props) {
   return (
     <div
       className="
-      group
-      rounded-xl
-      border border-gray-200
-      bg-white
-      p-3
-      transition-all
-      hover:shadow-md
+      group rounded-[20px] border border-white/10 bg-black/20 p-3
+      transition-all hover:border-white/20 hover:bg-white/[0.03]
       "
     >
-      {/* IMAGE */}
-      <div className="relative h-24 w-full rounded-lg bg-gray-50 overflow-hidden flex items-center justify-center">
-
+      <div className="relative flex h-24 w-full items-center justify-center overflow-hidden rounded-xl bg-white/[0.04]">
         {image ? (
           <Image
             src={image}
@@ -71,83 +64,52 @@ export function MarketplaceProductCard({ product }: Props) {
           />
         ) : (
           <div className="text-center px-2">
-            <div className="text-xs font-semibold text-gray-700">
-              Sin imagen
+            <div className="text-xs font-semibold text-zinc-300">
+              No image
             </div>
-            <div className="text-[10px] text-gray-400">
-              Producto incompleto
+            <div className="text-[10px] text-zinc-500">
+              Incomplete product
             </div>
           </div>
         )}
-
       </div>
-
-      {/* META */}
       <div className="mt-2 space-y-1">
-
-        <div className="text-[10px] text-gray-400 truncate">
+        <div className="truncate text-[10px] text-zinc-500">
           {product.sellerSku} · {product.publicationId}
         </div>
-
-        {/* TITLE */}
-        <div className="text-xs font-semibold text-gray-900 line-clamp-2 leading-tight">
+        <div className="line-clamp-2 text-xs font-semibold leading-tight text-white">
           {product.title}
         </div>
-
       </div>
-
-      {/* PRICE / STOCK */}
       <div className="mt-2 flex items-center justify-between">
-
-        <span className="text-sm font-semibold text-gray-900">
+        <span className="text-sm font-semibold text-white">
           ${product.price.toLocaleString()}
         </span>
-
-        <span className="text-[10px] bg-gray-100 text-gray-700 px-2 py-0.5 rounded-md">
+        <span className="rounded-md bg-white/[0.08] px-2 py-0.5 text-[10px] text-zinc-300">
           Stock {product.stock}
         </span>
-
       </div>
-
-      {/* STATUS */}
       <div className="mt-2 flex items-center justify-between">
-
         <span
-          className={`text-[10px] font-medium px-2 py-0.5 rounded-md ${statusBadge}`}
+          className={`rounded-md px-2 py-0.5 text-[10px] font-medium ${statusBadge}`}
         >
           {statusLabel}
         </span>
-
       </div>
-
-      {/* ACTION */}
       {product.publicationUrl && (
         <a
           href={product.publicationUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="
-          mt-3
-          flex
-          w-full
-          items-center
-          justify-center
-          rounded-md
-          border
-          border-gray-200
-          bg-white
-          py-1
-          text-[11px]
-          font-medium
-          text-gray-800
-          transition
-          hover:bg-gray-50
+          mt-3 flex w-full items-center justify-center rounded-xl border border-white/10
+          bg-white/[0.04] py-1.5 text-[11px] font-medium text-zinc-200 transition
+          hover:border-white/20 hover:text-white
           "
         >
-          Ver producto
+          View product
         </a>
       )}
-
     </div>
   );
 }

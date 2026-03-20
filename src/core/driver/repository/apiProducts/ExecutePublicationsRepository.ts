@@ -7,10 +7,12 @@ export class ExecutePublicationsRepository
   private readonly http: HttpClient;
 
   constructor(httpClient?: HttpClient) {
+    const baseUrl = process.env.NEXT_PUBLIC_PRODUCTS_API_URL?.replace(/\/$/, '');
+
     this.http =
       httpClient ??
       new HttpClient({
-        baseUrl: process.env.NEXT_PUBLIC_PRODUCTS_API_URL!, 
+        baseUrl: baseUrl ?? '',
       });
   }
 

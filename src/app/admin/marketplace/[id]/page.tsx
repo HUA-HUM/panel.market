@@ -14,14 +14,14 @@ export default async function MarketplaceDetailPage({ params }: Props) {
 
   if (!marketplace) {
     return (
-      <div className="flex-1 bg-gray-50 min-h-screen p-8">
-        <div className="rounded-lg border border-gray-200 bg-white p-8 text-center">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Marketplace no encontrado
+      <div className="min-h-screen w-full px-6 py-10">
+        <div className="mx-auto max-w-[1200px] rounded-[28px] border border-white/10 bg-[linear-gradient(145deg,rgba(8,12,26,0.98),rgba(7,11,18,0.98),rgba(4,7,16,1))] p-10 text-center shadow-[0_30px_100px_rgba(0,0,0,0.35)]">
+          <h2 className="text-2xl font-semibold text-white">
+            Marketplace not found
           </h2>
 
-          <p className="text-sm text-gray-500 mt-2">
-            El marketplace solicitado no existe.
+          <p className="mt-2 text-sm text-zinc-400">
+            The requested marketplace does not exist in this workspace.
           </p>
         </div>
       </div>
@@ -29,8 +29,10 @@ export default async function MarketplaceDetailPage({ params }: Props) {
   }
 
   return (
-    <div className="flex-1 bg-gray-50 min-h-screen p-8">
-      <MarketplaceDetailClient marketplace={marketplace} />
+    <div className="min-h-screen w-full px-6 py-10">
+      <div className="mx-auto max-w-[1500px]">
+        <MarketplaceDetailClient marketplace={marketplace} />
+      </div>
     </div>
   );
 }

@@ -11,68 +11,47 @@ export function MarketplaceCard({ marketplace }: Props) {
     <Link
       href={`/admin/marketplace/${marketplace.id}`}
       className="
-        group
-        relative
-        overflow-hidden
-        rounded-3xl
-        border
-        border-gray-200/60
-        bg-white/70
-        p-6
-        backdrop-blur-xl
-        transition-all
-        duration-300
-        hover:-translate-y-1
-        hover:shadow-2xl
-        hover:border-gray-300
+        group relative overflow-hidden rounded-[28px] border border-white/10
+        bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.03))]
+        p-6 backdrop-blur-xl transition-all duration-300
+        hover:-translate-y-1 hover:border-cyan-300/20
+        hover:shadow-[0_24px_60px_rgba(0,0,0,0.28)]
       "
     >
-      {/* Glow */}
       <div
         className="
-          pointer-events-none
-          absolute
-          inset-0
-          opacity-0
-          transition-opacity
-          duration-300
-          group-hover:opacity-100
+          pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100
         "
       >
-        <div className="absolute -top-24 left-1/2 h-48 w-48 -translate-x-1/2 rounded-full bg-gray-200/40 blur-3xl" />
+        <div className="absolute -right-12 top-0 h-40 w-40 rounded-full bg-cyan-400/15 blur-3xl" />
       </div>
 
-      {/* Content */}
-      <div className="relative flex h-full items-center justify-center">
-        <div className="relative h-20 w-40 transition-transform duration-300 group-hover:scale-105">
-          <Image
-            src={marketplace.logo}
-            alt={marketplace.name}
-            fill
-            className="object-contain"
-          />
+      <div className="relative space-y-8">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+              Marketplace
+            </p>
+            <h3 className="mt-2 text-xl font-semibold text-white">
+              {marketplace.name}
+            </h3>
+          </div>
+
+          <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-zinc-400">
+            Open
+          </span>
         </div>
-      </div>
 
-      {/* Subtle label */}
-      <div
-        className="
-          pointer-events-none
-          absolute
-          bottom-4
-          left-1/2
-          -translate-x-1/2
-          text-[10px]
-          uppercase
-          tracking-widest
-          text-gray-400
-          opacity-0
-          transition-opacity
-          duration-300
-          group-hover:opacity-100
-        "
-      >
-        Abrir marketplace
+        <div className="flex min-h-[140px] items-center justify-center rounded-[24px] border border-white/8 bg-black/20 p-6">
+          <div className="relative h-20 w-40 transition-transform duration-300 group-hover:scale-105">
+            <Image
+              src={marketplace.logo}
+              alt={marketplace.name}
+              fill
+              className="object-contain"
+            />
+          </div>
+        </div>
       </div>
     </Link>
   );

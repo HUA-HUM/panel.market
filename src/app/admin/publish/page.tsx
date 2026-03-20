@@ -1,5 +1,9 @@
 import PublishClient from './PublishClient';
 
 export default function Page() {
-  return <PublishClient />;
+  return (
+    <div className="w-full h-full">
+      <PublishClient />
+    </div>
+  );
 }

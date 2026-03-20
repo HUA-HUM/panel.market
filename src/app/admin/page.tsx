@@ -1,187 +1,122 @@
 'use client';
 
+const SECTIONS = [
+  {
+    title: 'Orders',
+    subtitle: 'Order status, volume, and pending actions.',
+    items: ['Recent orders', 'Pending approvals', 'Order health'],
+  },
+  {
+    title: 'Commerce Updates',
+    subtitle: 'Important marketplace and business updates.',
+    items: ['Marketplace changes', 'Catalog updates', 'System notices'],
+  },
+  {
+    title: 'Shipping',
+    subtitle: 'Shipment flow and delivery-related signals.',
+    items: ['Pending shipments', 'In transit', 'Shipping issues'],
+  },
+  {
+    title: 'Publisher',
+    subtitle: 'Publication runs and marketplace publishing activity.',
+    items: ['Latest runs', 'Pending jobs', 'Publishing alerts'],
+  },
+];
+
 export default function AdminOverviewPage() {
   return (
-    <div className="p-8 bg-zinc-900 min-h-screen text-white">
-      <h1 className="text-3xl font-semibold mb-8">
-        Admin Overview
-      </h1>
+    <div className="min-h-screen w-full px-6 py-10">
+      <div className="mx-auto w-full max-w-[1600px]">
+        <div
+          className="
+            relative overflow-hidden rounded-[30px] border border-white/10
+            bg-[linear-gradient(145deg,rgba(8,12,26,0.98),rgba(7,11,18,0.98),rgba(4,7,16,1))]
+            p-6 shadow-[0_30px_100px_rgba(0,0,0,0.45)]
+            md:p-8
+          "
+        >
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute inset-x-0 top-0 h-40 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.26),transparent_55%)]" />
+            <div className="absolute right-0 top-10 h-56 w-56 rounded-full bg-cyan-400/10 blur-3xl" />
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.024)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:84px_84px] opacity-[0.04]" />
+          </div>
 
-      {/* ================= MARKETPLACES ================= */}
+          <div className="relative space-y-6">
+            <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <div className="space-y-3">
+                <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/15 bg-cyan-300/10 px-3 py-1 text-[11px] uppercase tracking-[0.24em] text-cyan-100">
+                  Admin Overview
+                </div>
+                <h1 className="text-4xl font-semibold tracking-tight text-white md:text-5xl">
+                  Overview
+                </h1>
+              </div>
 
-      <section className="mb-12">
-        <h2 className="text-xl font-medium mb-6 text-zinc-300">
-          Resumen por Marketplace
-        </h2>
+              <span className="inline-flex w-fit items-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-medium text-zinc-300">
+                Preview
+              </span>
+            </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <MarketplaceCard
-            name="Mercado Libre"
-            totalOrders="12"
-            pendingShipments="3"
-            invoicedOrders="8"
-            sentToMarketplace="10"
-          />
-
-          <MarketplaceCard
-            name="Oncity"
-            totalOrders="2"
-            pendingShipments="1"
-            invoicedOrders="1"
-            sentToMarketplace="2"
-          />
-
-          <MarketplaceCard
-            name="Megatone"
-            totalOrders="4"
-            pendingShipments="2"
-            invoicedOrders="3"
-            sentToMarketplace="4"
-          />
+            <section className="grid gap-5 md:grid-cols-2 2xl:grid-cols-4">
+              {SECTIONS.map((section) => (
+                <OverviewSectionCard
+                  key={section.title}
+                  title={section.title}
+                  subtitle={section.subtitle}
+                  items={section.items}
+                />
+              ))}
+            </section>
+          </div>
         </div>
-      </section>
-
-      {/* ================= SYNC STATUS ================= */}
-
-      <section>
-        <h2 className="text-xl font-medium mb-6 text-zinc-300">
-          Sincronizaciones
-        </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <SyncCard
-            title="Autmeli - Products Sync"
-            lastUpdate="Hace 12 minutos"
-            status="success"
-          />
-
-          <SyncCard
-            title="Stock Sync"
-            lastUpdate="Hace 1 hora"
-            status="warning"
-          />
-        </div>
-      </section>
-    </div>
-  );
-}
-
-/* ================= MARKETPLACE CARD ================= */
-
-function MarketplaceCard({
-  name,
-  totalOrders,
-  pendingShipments,
-  invoicedOrders,
-  sentToMarketplace,
-}: {
-  name: string;
-  totalOrders: string;
-  pendingShipments: string;
-  invoicedOrders: string;
-  sentToMarketplace: string;
-}) {
-  return (
-    <div
-      className="
-        bg-zinc-950 
-        border border-zinc-800 
-        rounded-2xl 
-        p-6 
-        shadow-lg 
-        transition 
-        hover:-translate-y-1 
-        hover:border-zinc-700
-      "
-    >
-      <h3 className="text-lg text-zinc-400 mb-6">
-        {name}
-      </h3>
-
-      <div className="space-y-4">
-        <MetricRow label="Órdenes Totales" value={totalOrders} />
-        <MetricRow label="Envíos Pendientes / En curso" value={pendingShipments} highlight />
-        <MetricRow label="Órdenes Facturadas" value={invoicedOrders} />
-        <MetricRow label="Enviadas al Marketplace" value={sentToMarketplace} />
       </div>
     </div>
   );
 }
 
-/* ================= METRIC ROW ================= */
-
-function MetricRow({
-  label,
-  value,
-  highlight,
-}: {
-  label: string;
-  value: string;
-  highlight?: boolean;
-}) {
-  return (
-    <div className="flex items-center justify-between">
-      <span className="text-sm text-zinc-400">
-        {label}
-      </span>
-
-      <span
-        className={`font-semibold ${
-          highlight ? 'text-yellow-400' : 'text-white'
-        }`}
-      >
-        {value}
-      </span>
-    </div>
-  );
-}
-
-/* ================= SYNC CARD ================= */
-
-function SyncCard({
+function OverviewSectionCard({
   title,
-  lastUpdate,
-  status,
+  subtitle,
+  items,
 }: {
   title: string;
-  lastUpdate: string;
-  status: 'success' | 'warning' | 'error';
+  subtitle: string;
+  items: string[];
 }) {
-  const statusColor = {
-    success: 'bg-green-500',
-    warning: 'bg-yellow-500',
-    error: 'bg-red-500',
-  };
-
   return (
-    <div
-      className="
-        bg-zinc-950 
-        border border-zinc-800 
-        rounded-2xl 
-        p-6 
-        shadow-lg 
-        transition 
-        hover:border-zinc-700
-      "
-    >
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-zinc-300">
-          {title}
-        </h3>
+    <div className="relative overflow-hidden rounded-[24px] border border-white/10 bg-black/20 p-5">
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),transparent)]" />
 
-        <span
-          className={`h-3 w-3 rounded-full ${statusColor[status]}`}
-        />
+      <div className="relative space-y-5">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-lg font-semibold text-white">
+              {title}
+            </p>
+            <p className="mt-1 text-sm text-zinc-400">
+              {subtitle}
+            </p>
+          </div>
+
+          <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-zinc-400">
+            Soon
+          </span>
+        </div>
+
+        <div className="space-y-2">
+          {items.map((item) => (
+            <div
+              key={item}
+              className="flex items-center justify-between rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3"
+            >
+              <span className="text-sm text-zinc-300">
+                {item}
+              </span>
+              <span className="h-2.5 w-2.5 rounded-full bg-zinc-600" />
+            </div>
+          ))}
+        </div>
       </div>
-
-      <p className="text-sm text-zinc-400">
-        Última actualización:
-      </p>
-
-      <p className="text-white font-medium mt-1">
-        {lastUpdate}
-      </p>
     </div>
   );
 }

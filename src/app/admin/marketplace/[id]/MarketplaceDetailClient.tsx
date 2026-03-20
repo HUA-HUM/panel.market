@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 import { Marketplace } from '@/src/features/marketplace/config/marketplaces';
 import MarketplaceProductList from '@/src/features/marketplace/components/MarketplaceProductList/MarketplaceProductList';
@@ -14,10 +15,10 @@ type Props = {
 
 type Tab = 'products' | 'import' | 'actions';
 
-const TABS: { id: Tab; label: string }[] = [
-  { id: 'products', label: 'Productos' },
-  { id: 'import', label: 'Importación' },
-  { id: 'actions', label: 'Acciones' },
+const TABS: { id: Tab; label: string; description: string }[] = [
+  { id: 'products', label: 'Products', description: 'Browse live marketplace items.' },
+  { id: 'import', label: 'Imports', description: 'Sync marketplace catalog data.' },
+  { id: 'actions', label: 'Status', description: 'Review publication state summary.' },
 ];
 
 export default function MarketplaceDetailClient({ marketplace }: Props) {
@@ -28,24 +29,84 @@ export default function MarketplaceDetailClient({ marketplace }: Props) {
 
   return (
     <div className="flex h-full flex-col gap-6">
-      {/* ================= HEADER ================= */}
-      <div className="flex items-center gap-6">
-        <button
-          onClick={() => router.push('/admin/marketplace')}
-          className="group inline-flex items-center gap-2 rounded-xl border bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-white"
-        >
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-100">
-            ←
-          </span>
-          Volver a marketplaces
-        </button>
+      <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+        <div className="flex flex-col gap-5">
+          <button
+            onClick={() => router.push('/admin/marketplace')}
+            className="group inline-flex w-fit items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-medium text-zinc-300 transition hover:border-white/20 hover:text-white"
+          >
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/[0.06]">
+              ←
+            </span>
+            Back to marketplaces
+          </button>
+
+          <div className="space-y-4">
+            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/15 bg-cyan-300/10 px-3 py-1 text-[11px] uppercase tracking-[0.24em] text-cyan-100">
+              Marketplace Workspace
+            </div>
+
+            <div className="flex items-center gap-4">
+              <div className="flex h-18 w-18 items-center justify-center rounded-[22px] border border-white/10 bg-white p-4 shadow-[0_18px_45px_rgba(255,255,255,0.08)]">
+                <div className="relative h-10 w-24">
+                  <Image
+                    src={marketplace.logo}
+                    alt={marketplace.name}
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <h1 className="text-4xl font-semibold tracking-tight text-white">
+                  {marketplace.name}
+                </h1>
+                <p className="text-sm text-zinc-400">
+                  {marketplace.description}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.03))] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+          <p className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">
+            Active View
+          </p>
+          <div className="mt-4 space-y-4">
+            <div className="flex items-start justify-between gap-4 border-b border-white/8 pb-3">
+              <span className="text-xs uppercase tracking-[0.18em] text-zinc-500">
+                Marketplace
+              </span>
+              <span className="text-right text-sm font-medium text-white">
+                {marketplace.name}
+              </span>
+            </div>
+            <div className="flex items-start justify-between gap-4 border-b border-white/8 pb-3">
+              <span className="text-xs uppercase tracking-[0.18em] text-zinc-500">
+                Section
+              </span>
+              <span className="text-right text-sm font-medium text-white">
+                {TABS[activeIndex]?.label}
+              </span>
+            </div>
+            <div className="flex items-start justify-between gap-4">
+              <span className="text-xs uppercase tracking-[0.18em] text-zinc-500">
+                Focus
+              </span>
+              <span className="max-w-[250px] text-right text-sm text-zinc-300">
+                {TABS[activeIndex]?.description}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* ================= TABS ================= */}
-      <div className="relative">
-        <div className="relative flex rounded-xl bg-gray-100 p-1">
+      <div className="relative rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] p-2">
+        <div className="relative flex rounded-[20px] bg-black/10 p-1">
           <span
-            className="absolute top-1 bottom-1 rounded-lg bg-white transition-all duration-300"
+            className="absolute bottom-1 top-1 rounded-[16px] bg-[linear-gradient(135deg,rgba(103,232,249,0.16),rgba(37,99,235,0.18))] transition-all duration-300"
             style={{
               width: `${100 / TABS.length}%`,
               left: `${(100 / TABS.length) * activeIndex}%`,
@@ -64,17 +125,9 @@ export default function MarketplaceDetailClient({ marketplace }: Props) {
         </div>
       </div>
 
-      {/* ================= CONTENT ================= */}
       <div className="flex-1 overflow-y-auto">
         {tab === 'products' && (
-          <div className="flex flex-col gap-4">
-           
-
-            {/* ===== LIST (CON OVERLAY LOADER) ===== */}
-            <MarketplaceProductList
-              marketplaceId={marketplace.id}
-            />
-          </div>
+          <MarketplaceProductList marketplaceId={marketplace.id} />
         )}
 
         {tab === 'import' && (
@@ -84,11 +137,10 @@ export default function MarketplaceDetailClient({ marketplace }: Props) {
         )}
 
         {tab === 'actions' && (
-          <div className="text-sm text-gray-400">
-           
+          <div>
             <MarketplaceProductsHeader
               marketplaceId={marketplace.id as 'megatone' | 'oncity'}
-            /> 
+            />
           </div>
         )}
       </div>
@@ -111,10 +163,10 @@ function TabButton({
   return (
     <button
       onClick={onClick}
-      className={`relative z-10 flex-1 py-3 text-sm font-medium rounded-lg transition-all ${
+      className={`relative z-10 flex-1 rounded-[16px] py-3 text-sm font-medium transition-all ${
         active
-          ? 'text-gray-900'
-          : 'text-gray-500 hover:text-gray-800'
+          ? 'text-white'
+          : 'text-zinc-500 hover:text-zinc-200'
       }`}
     >
       {children}

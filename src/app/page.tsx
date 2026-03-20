@@ -3,149 +3,181 @@
 import Image from "next/image";
 
 const markets = [
-  { name: "Frávega", file: "fravega.png", size: 190, angle: 1 },
-  { name: "OnCity", file: "oncity.png", size: 90, angle: 150 },
-  { name: "Megatone", file: "Megatone.svg", size: 190, angle: 45 },
-  { name: "Casa del Audio", file: "casaaudio.png", size: 150, angle: 280 },
+  { name: "Fravega", file: "fravega.png", width: 132, angle: 8 },
+  { name: "OnCity", file: "oncity.png", width: 70, angle: 150 },
+  { name: "Megatone", file: "Megatone.svg", width: 136, angle: 42 },
+  { name: "Casa del Audio", file: "casaaudio.png", width: 112, angle: 286 },
 ];
 
-const RADIUS = 240;
+const RADIUS = 170;
 
 export default function Home() {
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-black text-white">
-      {/* Soft white glow */}
-      <div className="absolute inset-0 " />
+    <div className="relative h-screen overflow-hidden bg-[linear-gradient(145deg,#070b16,#09101f,#050811)] text-white">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute inset-x-0 top-0 h-40 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.22),transparent_55%)]" />
+        <div className="absolute right-0 top-0 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
+        <div className="absolute bottom-0 left-1/4 h-60 w-60 rounded-full bg-blue-500/10 blur-3xl" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:90px_90px] opacity-[0.05]" />
+      </div>
 
-      <main className="relative z-10 flex min-h-screen items-center justify-center px-6">
-        <div className="grid w-full max-w-6xl grid-cols-1 gap-24 md:grid-cols-2">
-
-          {/* INTEGRATION MAP */}
-          <div className="relative flex items-center justify-center">
-            {/* Core */}
-            <div className="relative z-20 flex h-36 w-36 items-center justify-center rounded-full bg-white  ring-2 ring-white shadow-[0_0_80px_rgba(255,255,255,0.6)]">
-              <Image
-                src="/LQA-logo.png"
-                alt="TLQ"
-                width={100}
-                height={100}
-                priority
-              />
-            </div>
-
-            {/* Tentacles (curved) */}
-            <svg
-              className="absolute"
-              width={RADIUS * 1.6}
-              height={RADIUS * 2}
-              viewBox={`0 0 ${RADIUS * 2} ${RADIUS * 2}`}
-            >
-              {markets.map((m) => {
-                const rad = (m.angle * Math.PI) / 180;
-                const x = RADIUS + Math.cos(rad) * RADIUS;
-                const y = RADIUS + Math.sin(rad) * RADIUS;
-
-                const cx1 = RADIUS + Math.cos(rad - 0.4) * (RADIUS * 0.45);
-                const cy1 = RADIUS + Math.sin(rad - 0.4) * (RADIUS * 0.45);
-                const cx2 = RADIUS + Math.cos(rad + 0.4) * (RADIUS * 0.75);
-                const cy2 = RADIUS + Math.sin(rad + 0.4) * (RADIUS * 0.75);
-
-                return (
-                  <g key={m.name}>
-                    {/* Glow */}
-                    <path
-                      d={`M ${RADIUS} ${RADIUS} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x} ${y}`}
-                      stroke="rgba(255,255,255,0.2)"
-                      strokeWidth="10"
-                      fill="none"
-                    />
-                    {/* Core line */}
-                    <path
-                      d={`M ${RADIUS} ${RADIUS} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x} ${y}`}
-                      stroke="rgba(255,255,255,0.85)"
-                      strokeWidth="2"
-                      fill="none"
-                    />
-                  </g>
-                );
-              })}
-            </svg>
-
-            {/* Market logos */}
-            {markets.map((m) => {
-              const rad = (m.angle * Math.PI) / 180;
-              const x = Math.cos(rad) * RADIUS;
-              const y = Math.sin(rad) * RADIUS;
-
-              return (
-                <div
-                  key={m.name}
-                  className="absolute"
-                  style={{
-                    transform: `translate(${x}px, ${y}px)`,
-                  }}
-                >
-                  <Image
-                    src={`/marketplace/${m.file}`}
-                    alt={m.name}
-                    width={m.size}
-                    height={m.size}
-                   className="bg-white rounded-xl p-2"/>
+      <main className="relative z-10 flex h-screen items-center justify-center px-6 py-6">
+        <div className="grid h-full max-h-[860px] w-full max-w-7xl grid-cols-1 gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+          <section className="flex min-h-0 items-center">
+            <div className="grid h-full w-full grid-rows-[auto_1fr] gap-6 rounded-[32px] border border-white/10 bg-white/[0.03] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] xl:p-8">
+              <div className="space-y-5">
+                <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/15 bg-cyan-300/10 px-3 py-1 text-[11px] uppercase tracking-[0.24em] text-cyan-100">
+                  Unified Commerce Platform
                 </div>
-              );
-            })}
-          </div>
 
-         {/* LOGIN */}
-<div className="flex items-center justify-center">
-  <div className="w-full max-w-md rounded-3xl border border-white/40 bg-white p-10 text-black shadow-[0_0_60px_rgba(255,255,255,0.18)]">
+                <div className="max-w-2xl space-y-3">
+                  <h1 className="text-4xl font-semibold tracking-tight text-white md:text-6xl md:leading-[0.98]">
+                    Unify
+                    <br />
+                    marketplaces
+                    <br />
+                    and retailers.
+                  </h1>
+                  <p className="max-w-md text-sm leading-6 text-zinc-300 md:text-base">
+                    Catalog, commerce, shipping, and publishing in one control surface.
+                  </p>
+                </div>
+              </div>
 
-    
+              <div className="relative min-h-0 overflow-hidden rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))]">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05),transparent_60%)]" />
 
-    {/* Form */}
-    <form className="flex flex-col gap-6">
-      
-      {/* Email */}
-      <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium uppercase tracking-wide text-black/60">
-          Email
-        </label>
-        <input
-          type="email"
-          placeholder="usuario@empresa.com"
-          className="rounded-xl border border-black/20 bg-white px-4 py-3 text-sm outline-none transition focus:border-black"
-        />
-      </div>
+                <div className="absolute left-6 top-6 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-zinc-400">
+                  Connected network
+                </div>
 
-      {/* Password */}
-      <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium uppercase tracking-wide text-black/60">
-          Contraseña
-        </label>
-        <input
-          type="password"
-          placeholder="••••••••"
-          className="rounded-xl border border-black/20 bg-white px-4 py-3 text-sm outline-none transition focus:border-black"
-        />
-      </div>
+                <div className="relative flex h-full items-center justify-center p-6">
+                  <div className="relative z-20 flex h-32 w-32 items-center justify-center rounded-full border border-white/20 bg-white shadow-[0_0_80px_rgba(255,255,255,0.24)]">
+                    <Image
+                      src="/LQA-logo.png"
+                      alt="TLQ"
+                      width={84}
+                      height={84}
+                      priority
+                    />
+                  </div>
 
-      {/* Action */}
-      <button
-        type="submit"
-        className="mt-4 rounded-xl bg-black py-3 text-sm font-semibold text-white transition hover:bg-black/90"
-      >
-        Ingresar a la plataforma
-      </button>
-    </form>
+                  <svg
+                    className="absolute"
+                    width={RADIUS * 2}
+                    height={RADIUS * 2}
+                    viewBox={`0 0 ${RADIUS * 2} ${RADIUS * 2}`}
+                  >
+                    {markets.map((market) => {
+                      const rad = (market.angle * Math.PI) / 180;
+                      const x = RADIUS + Math.cos(rad) * RADIUS;
+                      const y = RADIUS + Math.sin(rad) * RADIUS;
+                      const cx1 = RADIUS + Math.cos(rad - 0.42) * (RADIUS * 0.42);
+                      const cy1 = RADIUS + Math.sin(rad - 0.42) * (RADIUS * 0.42);
+                      const cx2 = RADIUS + Math.cos(rad + 0.28) * (RADIUS * 0.76);
+                      const cy2 = RADIUS + Math.sin(rad + 0.28) * (RADIUS * 0.76);
 
-    {/* Footer */}
-    <div className="mt-8 text-center">
-      <p className="text-xs text-black/40">
-        Acceso exclusivo para cuentas habilitadas
-      </p>
-    </div>
-  </div>
-</div>
+                      return (
+                        <g key={market.name}>
+                          <path
+                            d={`M ${RADIUS} ${RADIUS} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x} ${y}`}
+                            stroke="rgba(56,189,248,0.16)"
+                            strokeWidth="10"
+                            fill="none"
+                          />
+                          <path
+                            d={`M ${RADIUS} ${RADIUS} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x} ${y}`}
+                            stroke="rgba(255,255,255,0.76)"
+                            strokeWidth="2"
+                            fill="none"
+                          />
+                        </g>
+                      );
+                    })}
+                  </svg>
+
+                  {markets.map((market) => {
+                    const rad = (market.angle * Math.PI) / 180;
+                    const x = Math.cos(rad) * RADIUS;
+                    const y = Math.sin(rad) * RADIUS;
+
+                    return (
+                      <div
+                        key={market.name}
+                        className="absolute"
+                        style={{ transform: `translate(${x}px, ${y}px)` }}
+                      >
+                        <div className="rounded-2xl border border-white/10 bg-white p-2.5 shadow-[0_18px_45px_rgba(255,255,255,0.08)]">
+                          <Image
+                            src={`/marketplace/${market.file}`}
+                            alt={market.name}
+                            width={market.width}
+                            height={market.width}
+                            className="h-auto object-contain"
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+               
+              </div>
+            </div>
+          </section>
+
+          <section className="flex min-h-0 items-center justify-center">
+            <div className="w-full max-w-md rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] p-7 shadow-[0_30px_80px_rgba(0,0,0,0.35)] backdrop-blur-xl md:p-9">
+              <div className="space-y-3">
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-zinc-300">
+                  Access
+                </div>
+                <h2 className="text-3xl font-semibold tracking-tight text-white">
+                  Sign in
+                </h2>
+                <p className="text-sm text-zinc-400">
+                  Admin workspace
+                </p>
+              </div>
+
+              <form className="mt-8 flex flex-col gap-4">
+                <div className="flex flex-col gap-2">
+                  <label className="text-[11px] font-medium uppercase tracking-[0.18em] text-zinc-500">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="user@company.com"
+                    className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-cyan-400/40 focus:ring-2 focus:ring-cyan-400/20"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <label className="text-[11px] font-medium uppercase tracking-[0.18em] text-zinc-500">
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="••••••••"
+                    className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-cyan-400/40 focus:ring-2 focus:ring-cyan-400/20"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="mt-2 inline-flex items-center justify-center rounded-2xl border border-cyan-300/20 bg-[linear-gradient(135deg,#67e8f9,#2563eb,#0f172a)] px-6 py-3.5 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(37,99,235,0.35)] transition duration-200 hover:scale-[1.01] hover:shadow-[0_22px_50px_rgba(37,99,235,0.4)]"
+                >
+                  Enter
+                </button>
+              </form>
+
+              <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+                <p className="text-xs text-zinc-500">
+                  Secure access for enabled accounts.
+                </p>
+              </div>
+            </div>
+          </section>
         </div>
       </main>
     </div>

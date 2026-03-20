@@ -22,52 +22,32 @@ export default function MarketplaceProductList({ marketplaceId }: Props) {
   } = useMarketplaceProducts({ marketplaceId });
 
   return (
-    <div className="relative rounded-xl border border-gray-200 bg-white p-5 shadow-sm space-y-6">
-
-      {/* ================= HEADER ================= */}
+    <div className="relative space-y-6 rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.03))] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
       <div className="flex items-center justify-between">
-
         <div>
-          <h3 className="text-sm font-semibold text-gray-900">
-            Productos publicados
+          <h3 className="text-sm font-semibold text-white">
+            Published products
           </h3>
-
-          <p className="text-xs text-gray-500">
-            {items.length} productos cargados
+          <p className="text-xs text-zinc-500">
+            {items.length} products loaded
           </p>
         </div>
-
         <button
           onClick={refresh}
           disabled={loading}
           className="
-            inline-flex items-center gap-2
-            rounded-lg
-            border border-gray-200
-            px-3 py-1.5
-            text-xs font-medium text-gray-700
-            hover:bg-gray-50
-            disabled:opacity-40
-            transition
+            inline-flex items-center gap-2 rounded-xl border border-white/10
+            bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-zinc-300
+            transition hover:border-white/20 hover:text-white disabled:opacity-40
           "
         >
-          ⟳ Actualizar
+          ⟳ Refresh
         </button>
-
       </div>
-
-      {/* ================= GRID ================= */}
       <div className="relative">
-
         <div
           className="
-            grid
-            grid-cols-2
-            sm:grid-cols-3
-            md:grid-cols-4
-            lg:grid-cols-5
-            xl:grid-cols-6
-            gap-4
+            grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6
           "
         >
           {(loading && items.length === 0) &&
@@ -83,77 +63,50 @@ export default function MarketplaceProductList({ marketplaceId }: Props) {
               />
             ))}
         </div>
-
-        {/* ================= LOADER OVERLAY ================= */}
         {(loading || paging) && (
           <div
             className="
-              absolute inset-0
-              rounded-xl
-              bg-white/70
-              backdrop-blur-sm
-              flex flex-col items-center justify-center
-              gap-3
-              z-10
+              absolute inset-0 z-10 flex flex-col items-center justify-center gap-3
+              rounded-[20px] bg-[#07101dcc] backdrop-blur-sm
             "
           >
             <BrandSpinner />
-
-            <span className="text-xs text-gray-500">
-              Cargando productos…
+            <span className="text-xs text-zinc-400">
+              Loading products...
             </span>
-
           </div>
         )}
-
       </div>
-
-      {/* ================= PAGINATION ================= */}
-      <div className="flex items-center justify-between border-t border-gray-100 pt-4">
-
-        <span className="text-xs text-gray-500">
-          Página <b className="text-gray-900">{page}</b> de{' '}
-          <b className="text-gray-900">{totalPages || 1}</b>
+      <div className="flex items-center justify-between border-t border-white/8 pt-4">
+        <span className="text-xs text-zinc-500">
+          Page <b className="text-white">{page}</b> of{' '}
+          <b className="text-white">{totalPages || 1}</b>
         </span>
-
         <div className="flex items-center gap-2">
-
           <button
             onClick={fetchPrev}
             disabled={page === 1 || paging}
             className="
-              rounded-lg
-              border border-gray-200
-              px-3 py-1.5
-              text-xs font-medium text-gray-700
-              hover:bg-gray-50
-              disabled:opacity-30
-              transition
+              rounded-xl border border-white/10 bg-white/[0.04] px-3 py-1.5
+              text-xs font-medium text-zinc-300 transition hover:border-white/20
+              hover:text-white disabled:opacity-30
             "
           >
-            ← Anterior
+            ← Previous
           </button>
-
           <button
             onClick={fetchNext}
             disabled={page === totalPages || paging}
             className="
-              rounded-lg
-              border border-gray-200
-              px-3 py-1.5
-              text-xs font-medium text-gray-700
-              hover:bg-gray-50
-              disabled:opacity-30
-              transition
+              rounded-xl border border-white/10 bg-white/[0.04] px-3 py-1.5
+              text-xs font-medium text-zinc-300 transition hover:border-white/20
+              hover:text-white disabled:opacity-30
             "
           >
-            Siguiente →
+            Next →
           </button>
-
         </div>
-
       </div>
-
     </div>
   );
 }
