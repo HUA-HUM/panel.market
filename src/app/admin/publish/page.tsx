@@ -1,3 +1,5 @@
+import PublishClient from './PublishClient';
+
 export default function Page() {
-  return <div>Orders</div>;
+  return <PublishClient />;
 }
