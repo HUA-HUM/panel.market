@@ -29,11 +29,6 @@ private async request<T>(
 
   const url = `${this.baseUrl}${path}`;
 
-  console.log("📡 HTTP REQUEST");
-  console.log("method:", method);
-  console.log("url:", url);
-  console.log("body:", body);
-
   const res = await fetch(url, {
     method,
     headers: {
@@ -44,16 +39,12 @@ private async request<T>(
     cache: 'no-store',
   });
 
-  console.log("📡 HTTP RESPONSE STATUS:", res.status);
 
   if (!res.ok) {
 
     const text = await res.text();
 
-    console.error("❌ HTTP ERROR");
-    console.error("url:", url);
-    console.error("status:", res.status);
-    console.error("response:", text);
+  
 
     throw new HttpError(res.status, text);
   }

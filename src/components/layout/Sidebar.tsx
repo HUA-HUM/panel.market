@@ -80,6 +80,15 @@ export default function Sidebar() {
           collapsed={collapsed}
         />
 
+
+        {/* publicaador */}
+       <SidebarLink
+  href="/admin/publish"
+  label="Publisher"
+  active={pathname.startsWith('/admin/publish')}
+  collapsed={collapsed}
+/>
+
         {/* Commerce */}
         <SidebarLink
           href="/admin/commerce"
