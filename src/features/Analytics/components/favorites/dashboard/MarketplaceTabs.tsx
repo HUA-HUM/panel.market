@@ -16,9 +16,7 @@ export function MarketplaceTabs({
   onCreate,
 }: Props) {
   return (
-    <div className="flex items-center gap-3 flex-wrap">
-
-      {/* TABS */}
+    <div className="flex flex-wrap items-center gap-3">
       {marketplaces.map((marketplace) => {
         const isActive = selected === marketplace.id;
         const isClosed = marketplace.status === 'closed';
@@ -27,11 +25,11 @@ export function MarketplaceTabs({
           <button
             key={marketplace.id}
             onClick={() => onSelect(marketplace.id)}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all
+            className={`rounded-2xl px-4 py-2.5 text-sm font-medium transition-all
               ${
                 isActive
-                  ? 'bg-white text-black shadow-md'
-                  : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white'
+                  ? 'bg-[linear-gradient(135deg,rgba(103,232,249,0.16),rgba(37,99,235,0.18))] text-white shadow-[0_16px_40px_rgba(37,99,235,0.15)]'
+                  : 'border border-white/8 bg-white/[0.03] text-zinc-400 hover:border-white/14 hover:text-white'
               }
             `}
           >
@@ -39,7 +37,6 @@ export function MarketplaceTabs({
               <span>{marketplace.name}</span>
 
               {isClosed ? (
-                /* 🔒 Candado gris */
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="w-3.5 h-3.5 text-zinc-400"
@@ -55,7 +52,6 @@ export function MarketplaceTabs({
                   />
                 </svg>
               ) : (
-                /* 🟢 Punto verde */
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               )}
             </div>
@@ -67,9 +63,9 @@ export function MarketplaceTabs({
       <button
         type="button"
         onClick={onCreate}
-        className="px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-500 transition"
+        className="rounded-2xl border border-cyan-300/20 bg-[linear-gradient(135deg,#67e8f9,#2563eb,#0f172a)] px-4 py-2.5 text-sm font-medium text-white transition hover:scale-[1.01]"
       >
-        + Nueva carpeta
+        + New folder
       </button>
     </div>
   );

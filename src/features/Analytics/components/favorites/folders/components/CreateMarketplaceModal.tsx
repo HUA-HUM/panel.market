@@ -27,32 +27,32 @@ export function CreateMarketplaceModal({
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl w-[420px] shadow-2xl">
+      <div className="w-[420px] rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(18,24,39,0.98),rgba(10,12,19,0.98))] p-6 shadow-2xl">
 
-        <h3 className="text-lg font-semibold text-white mb-4">
-          Crear nueva carpeta
+        <h3 className="mb-4 text-lg font-semibold text-white">
+          Create new folder
         </h3>
 
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Nombre de la carpeta"
-          className="w-full p-3 rounded-xl bg-zinc-800 border border-zinc-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-600"
+          placeholder="Folder name"
+          className="w-full rounded-2xl border border-white/10 bg-white/[0.04] p-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
         />
 
         <div className="flex justify-end gap-3 mt-6">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-zinc-700 text-white hover:bg-zinc-600 transition"
+            className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-2 text-white transition hover:border-white/20"
           >
-            Cancelar
+            Cancel
           </button>
 
           <button
             onClick={handleSubmit}
-            className="px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-500 transition"
+            className="rounded-2xl border border-cyan-300/20 bg-[linear-gradient(135deg,#67e8f9,#2563eb,#0f172a)] px-4 py-2 text-white transition"
           >
-            Crear
+            Create
           </button>
         </div>
       </div>

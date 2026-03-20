@@ -7,32 +7,30 @@ export default function StrategiesPage() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white flex flex-col">
+    <div className="min-h-screen w-full px-6 py-10 text-white">
+      <div className="mx-auto max-w-[1600px] space-y-8">
+        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div className="space-y-3">
+            <button
+              onClick={() => router.push('/admin/commerce')}
+              className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-zinc-300 transition hover:border-white/20 hover:text-white"
+            >
+              ← Back
+            </button>
 
-      {/* ===== HEADER ===== */}
-      <div className="flex items-center gap-4 px-8 pt-8 pb-6 border-b border-zinc-800">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/15 bg-cyan-300/10 px-3 py-1 text-[11px] uppercase tracking-[0.24em] text-cyan-100">
+                Strategic Products
+              </div>
+              <h1 className="text-4xl font-semibold tracking-tight text-white">
+                Favorites
+              </h1>
+            </div>
+          </div>
+        </div>
 
-        <button
-          onClick={() => router.push('/admin/commerce')}
-          className="flex items-center gap-2 text-zinc-400 hover:text-white transition"
-        >
-          <span className="text-lg">←</span>
-          <span className="text-sm">Volver</span>
-        </button>
-
-        <span className="text-zinc-700">/</span>
-
-        <h1 className="text-lg font-medium tracking-wide">
-          Strategic Products
-        </h1>
-
-      </div>
-
-      {/* ===== CONTENT ===== */}
-      <div className="flex-1 overflow-y-auto p-8">
         <FavoritesDashboard />
       </div>
-
     </div>
   );
 }

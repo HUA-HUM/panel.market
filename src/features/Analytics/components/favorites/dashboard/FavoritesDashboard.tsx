@@ -70,17 +70,12 @@ export default function FavoritesDashboard() {
 
   return (
     <div className="space-y-8">
-
-      {/* ================= TABS ================= */}
-
       <MarketplaceTabs
         marketplaces={marketplaces}
         selected={selectedId}
         onSelect={setSelectedId}
         onCreate={() => setShowCreate(true)}
       />
-
-      {/* ================= CREATE MODAL ================= */}
 
       <CreateMarketplaceModal
         open={showCreate}
@@ -89,8 +84,8 @@ export default function FavoritesDashboard() {
       />
 
       {!selectedId && (
-        <div className="text-center text-zinc-500 py-20">
-          Seleccioná una carpeta o creá una nueva.
+        <div className="rounded-[24px] border border-dashed border-white/10 bg-white/[0.03] py-20 text-center text-zinc-500">
+          Select a folder or create a new one.
         </div>
       )}
 
@@ -105,51 +100,50 @@ export default function FavoritesDashboard() {
 
           {/* ================= HEADER ================= */}
 
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <div className="rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.03))] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+              <div className="space-y-2">
+                <div className="flex items-center gap-4">
+                  <h2 className="text-2xl font-semibold text-white">
+                    {selected.name}
+                  </h2>
+                  <MarketplaceStatusBadge status={selected.status} />
+                </div>
 
-            <div className="space-y-2">
-              <div className="flex items-center gap-4">
-                <h2 className="text-2xl font-semibold text-white">
-                  {selected.name}
-                </h2>
-                <MarketplaceStatusBadge status={selected.status} />
+                <p className="text-sm text-zinc-400">
+                  Manage products and overview metrics for this folder.
+                </p>
               </div>
 
-              <p className="text-sm text-zinc-400">
-                Gestioná productos y métricas de esta carpeta.
-              </p>
-            </div>
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={() =>
+                    window.open(
+                      `/admin/commerce/favorites/${selectedId}/products`,
+                      '_blank'
+                    )
+                  }
+                  className="rounded-2xl border border-cyan-300/20 bg-[linear-gradient(135deg,#67e8f9,#2563eb,#0f172a)] px-5 py-2.5 text-sm font-medium text-white transition hover:scale-[1.01]"
+                >
+                  View products
+                </button>
 
-            <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={handleStatusToggle}
+                  className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-white transition hover:border-white/20"
+                >
+                  {selected.status === 'active'
+                    ? 'Close folder'
+                    : 'Reactivate'}
+                </button>
 
-              <button
-                onClick={() =>
-                  window.open(
-                    `/admin/commerce/favorites/${selectedId}/products`,
-                    '_blank'
-                  )
-                }
-                className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium transition shadow-lg shadow-blue-900/20"
-              >
-                Ver productos
-              </button>
-
-              <button
-                onClick={handleStatusToggle}
-                className="px-4 py-2 rounded-xl bg-zinc-800 text-white hover:bg-zinc-700 transition text-sm"
-              >
-                {selected.status === 'active'
-                  ? 'Cerrar carpeta'
-                  : 'Reactivar'}
-              </button>
-
-              <button
-                onClick={() => setShowDelete(true)}
-                className="px-4 py-2 rounded-xl bg-red-600 text-white hover:bg-red-500 transition text-sm"
-              >
-                Eliminar
-              </button>
-
+                <button
+                  onClick={() => setShowDelete(true)}
+                  className="rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-2 text-sm text-red-100 transition hover:bg-red-500/15"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           </div>
 
@@ -171,8 +165,6 @@ export default function FavoritesDashboard() {
         </div>
       )}
 
-      {/* ================= DELETE MODAL ================= */}
-
       <ConfirmDeleteModal
         open={showDelete}
         onClose={() => setShowDelete(false)}
@@ -189,7 +181,7 @@ export default function FavoritesDashboard() {
 function Spinner() {
   return (
     <div className="flex items-center justify-center">
-      <div className="w-8 h-8 border-2 border-zinc-500 border-t-transparent rounded-full animate-spin" />
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-500 border-t-transparent" />
     </div>
   );
 }

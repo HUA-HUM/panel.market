@@ -7,67 +7,54 @@ export default function AllProductsPage() {
   const router = useRouter();
 
   return (
-    <div className="h-screen w-full bg-zinc-950 text-white flex flex-col">
-
-      {/* ===== TOP HEADER ===== */}
-      <div className="flex items-center gap-4 px-8 py-6 border-b border-zinc-800">
-
-        <button
-          onClick={() => router.push('/admin/commerce/analytics')}
-          className="flex items-center gap-2 text-zinc-400 hover:text-white transition"
-        >
-          <span className="text-lg">←</span>
-          <span className="text-sm">Volver</span>
-        </button>
-
-        <div className="text-zinc-600 text-sm">/</div>
-
-        <h1 className="text-lg font-medium">
-          Analytics / Productos
-        </h1>
-      </div>
-
-      {/* ===== BODY ===== */}
-      <div className="flex flex-1 overflow-hidden">
-
-        {/* ===== SIDEBAR ===== */}
-        <aside className="w-64 border-r border-zinc-800 bg-zinc-900/40 flex flex-col">
-          <nav className="flex-1 px-4 py-6 space-y-2 text-sm">
-
-            <SidebarItem
-              label="Categorías"
+    <div className="min-h-screen w-full px-6 py-10 text-white">
+      <div className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-[1600px] gap-6">
+        <aside className="w-72 shrink-0 rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.03))] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+          <div className="space-y-4">
+            <button
               onClick={() => router.push('/admin/commerce/analytics')}
-            />
+              className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-zinc-300 transition hover:border-white/20 hover:text-white"
+            >
+              ← Back
+            </button>
 
-            <SidebarItem
-              label="Productos"
-              active
-            />
+            <div className="space-y-3">
+              <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/15 bg-cyan-300/10 px-3 py-1 text-[11px] uppercase tracking-[0.24em] text-cyan-100">
+                Commerce Analytics
+              </div>
+              <h1 className="text-3xl font-semibold tracking-tight text-white">
+                Products
+              </h1>
+            </div>
 
-            <SidebarItem
-              label="Marcas"
-              disabled
-            />
-
-            <SidebarItem
-              label="Más vendidos"
-              disabled
-            />
-
-          </nav>
+            <nav className="space-y-2 pt-2 text-sm">
+              <SidebarItem
+                label="Categories"
+                onClick={() => router.push('/admin/commerce/analytics')}
+              />
+              <SidebarItem
+                label="Products"
+                active
+              />
+              <SidebarItem
+                label="Brands"
+                disabled
+              />
+              <SidebarItem
+                label="Best Sellers"
+                disabled
+              />
+            </nav>
+          </div>
         </aside>
 
-        {/* ===== MAIN CONTENT ===== */}
-        <main className="flex-1 overflow-auto p-10">
+        <main className="min-w-0 flex-1 overflow-auto rounded-[28px] border border-white/10 bg-[linear-gradient(145deg,rgba(8,12,26,0.98),rgba(7,11,18,0.98),rgba(4,7,16,1))] p-8 shadow-[0_30px_100px_rgba(0,0,0,0.35)]">
           <ProductsAnalyticsPanel />
         </main>
-
       </div>
     </div>
   );
 }
-
-/* ================= SIDEBAR ITEM ================= */
 
 function SidebarItem({
   label,
@@ -83,12 +70,12 @@ function SidebarItem({
   return (
     <button
       onClick={!disabled ? onClick : undefined}
-      className={`w-full text-left px-4 py-2 rounded-lg transition ${
+      className={`w-full rounded-2xl px-4 py-3 text-left transition ${
         disabled
-          ? 'text-zinc-600 cursor-not-allowed'
+          ? 'cursor-not-allowed text-zinc-600'
           : active
-          ? 'bg-blue-600 text-white'
-          : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
+          ? 'bg-[linear-gradient(135deg,rgba(103,232,249,0.16),rgba(37,99,235,0.18))] text-white'
+          : 'text-zinc-400 hover:bg-white/[0.04] hover:text-white'
       }`}
     >
       {label}

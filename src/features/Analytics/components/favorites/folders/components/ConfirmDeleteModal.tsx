@@ -15,40 +15,40 @@ export function ConfirmDeleteModal({
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl w-[420px] shadow-2xl">
+      <div className="w-[420px] rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(18,24,39,0.98),rgba(10,12,19,0.98))] p-6 shadow-2xl">
         
-        <h3 className="text-lg font-semibold mb-2 text-white">
-          ¿Eliminar carpeta?
+        <h3 className="mb-2 text-lg font-semibold text-white">
+          Delete folder?
         </h3>
 
-        <p className="text-sm text-zinc-400 mb-6">
-          Esta acción no se puede deshacer.
+        <p className="mb-6 text-sm text-zinc-400">
+          This action cannot be undone.
         </p>
 
         {disabled && (
-          <div className="mb-4 text-xs text-yellow-400 bg-yellow-500/10 border border-yellow-500/30 rounded-lg px-3 py-2">
-            No podés eliminar una carpeta cerrada.
+          <div className="mb-4 rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-3 py-2 text-xs text-yellow-400">
+            Closed folders cannot be deleted.
           </div>
         )}
 
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-sm transition"
+            className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-2 text-sm transition hover:border-white/20"
           >
-            Cancelar
+            Cancel
           </button>
 
           <button
             onClick={onConfirm}
             disabled={disabled}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition ${
+            className={`rounded-2xl px-4 py-2 text-sm font-medium transition ${
               disabled
-                ? 'bg-red-900/40 text-red-400 cursor-not-allowed'
-                : 'bg-red-600 hover:bg-red-500 text-white'
+                ? 'cursor-not-allowed bg-red-900/40 text-red-400'
+                : 'bg-red-600 text-white hover:bg-red-500'
             }`}
           >
-            Eliminar
+            Delete
           </button>
         </div>
       </div>
