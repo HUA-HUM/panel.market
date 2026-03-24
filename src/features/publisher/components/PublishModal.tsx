@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { useFolders } from '../hook/useFolders';
 import {
   ExecutePublicationsResponse,
@@ -83,12 +84,16 @@ export function PublishPanel({ onRunCreated }: PublishPanelProps) {
 
   const handleExecute = async () => {
     if (!selectedFolder) {
-      setValidationMessage('Select a source folder before launching the publication run.');
+      const message = 'Select a source folder before launching the publication run.';
+      setValidationMessage(message);
+      toast.warning(message);
       return;
     }
 
     if (!selectedMarketplaces.length) {
-      setValidationMessage('Select at least one marketplace destination.');
+      const message = 'Select at least one marketplace destination.';
+      setValidationMessage(message);
+      toast.warning(message);
       return;
     }
 
@@ -99,8 +104,19 @@ export function PublishPanel({ onRunCreated }: PublishPanelProps) {
         folderId: selectedFolder
       });
       setResult(res);
+      toast.success('Publication run created', {
+        description: `Run #${res.runId} is now available in the progress view.`,
+      });
       onRunCreated?.(res.runId);
-    } catch {}
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : 'Unable to launch the publication run.';
+      toast.error('Launch failed', {
+        description: message,
+      });
+    }
   };
 
   return (

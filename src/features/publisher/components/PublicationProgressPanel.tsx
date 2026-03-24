@@ -7,6 +7,18 @@ type PublicationProgressPanelProps = {
   initialRunId?: string | null;
 };
 
+function normalizeRunId(value: unknown): string {
+  if (typeof value === 'string') {
+    return value.trim();
+  }
+
+  if (typeof value === 'number') {
+    return String(value);
+  }
+
+  return '';
+}
+
 function formatDate(value: string | null) {
   if (!value) {
     return 'Not available';
@@ -68,11 +80,11 @@ export function PublicationProgressPanel({
     error,
     refresh
   } = usePublicationProgress({ initialRunId });
-  const [draftRunId, setDraftRunId] = useState(initialRunId ?? '');
+  const [draftRunId, setDraftRunId] = useState(normalizeRunId(initialRunId));
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const nextRunId = draftRunId.trim();
+    const nextRunId = normalizeRunId(draftRunId);
     setRunId(nextRunId);
     await refresh(nextRunId);
   };

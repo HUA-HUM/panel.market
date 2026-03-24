@@ -102,7 +102,7 @@ export default function PublishClient() {
           {tab === 'publish' && (
             <PublishPanel
               onRunCreated={(runId) => {
-                setActiveRunId(runId);
+                setActiveRunId(String(runId));
                 setTab('progress');
               }}
             />

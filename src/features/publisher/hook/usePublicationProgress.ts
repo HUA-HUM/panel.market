@@ -12,8 +12,20 @@ type UsePublicationProgressOptions = {
   initialRunId?: string | null;
 };
 
+function normalizeRunId(value: unknown): string {
+  if (typeof value === 'string') {
+    return value.trim();
+  }
+
+  if (typeof value === 'number') {
+    return String(value);
+  }
+
+  return '';
+}
+
 export function usePublicationProgress(options?: UsePublicationProgressOptions) {
-  const [runId, setRunId] = useState(options?.initialRunId ?? '');
+  const [runId, setRunId] = useState(normalizeRunId(options?.initialRunId));
   const [run, setRun] = useState<PublicationRun | null>(null);
   const [progress, setProgress] = useState<PublicationRunProgress | null>(null);
   const [pendingJobs, setPendingJobs] = useState<PendingPublicationJob[]>([]);
@@ -21,7 +33,7 @@ export function usePublicationProgress(options?: UsePublicationProgressOptions) 
   const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async (nextRunId?: string) => {
-    const resolvedRunId = (nextRunId ?? runId).trim();
+    const resolvedRunId = normalizeRunId(nextRunId ?? runId);
 
     if (!resolvedRunId) {
       setRun(null);
@@ -64,7 +76,7 @@ export function usePublicationProgress(options?: UsePublicationProgressOptions) 
       return;
     }
 
-    setRunId(options.initialRunId);
+    setRunId(normalizeRunId(options.initialRunId));
   }, [options?.initialRunId]);
 
   useEffect(() => {

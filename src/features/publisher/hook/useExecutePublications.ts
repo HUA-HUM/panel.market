@@ -15,6 +15,18 @@ export type ExecutePublicationsResponse = {
   totalJobs: number;
 };
 
+function normalizeRunId(value: unknown): string {
+  if (typeof value === 'string') {
+    return value.trim();
+  }
+
+  if (typeof value === 'number') {
+    return String(value);
+  }
+
+  return '';
+}
+
 export function useExecutePublications() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +39,10 @@ export function useExecutePublications() {
 
     try {
       const response = await repository.execute(data);
-      return response;
+      return {
+        ...response,
+        runId: normalizeRunId((response as { runId?: unknown }).runId),
+      };
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Error ejecutando publicaciones';
       console.error('[EXECUTE_PUBLICATIONS_ERROR]', err);
