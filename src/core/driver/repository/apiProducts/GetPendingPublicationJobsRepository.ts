@@ -19,7 +19,7 @@ export class GetPendingPublicationJobsRepository
 
   execute(limit = 10): Promise<PendingPublicationJob[]> {
     return this.http.get<PendingPublicationJob[]>(
-      `/products/publication-jobs/pending?limit=${limit}`
+      `/madre/publication-jobs/pending?limit=${limit}`
     );
   }
 }
