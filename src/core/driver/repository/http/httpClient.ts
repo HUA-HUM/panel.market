@@ -28,13 +28,17 @@ private async request<T>(
 ): Promise<T> {
 
   const url = `${this.baseUrl}${path}`;
+  const headers: Record<string, string> = {
+    ...this.headers,
+  };
+
+  if (body !== undefined) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   const res = await fetch(url, {
     method,
-    headers: {
-      'Content-Type': 'application/json',
-      ...this.headers,
-    },
+    headers,
     body: body ? JSON.stringify(body) : undefined,
     cache: 'no-store',
   });

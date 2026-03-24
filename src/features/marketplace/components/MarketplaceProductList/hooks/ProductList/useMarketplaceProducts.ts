@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { MarketplaceProduct } from '@/src/core/entitis/marketplace/shared/products/get/MarketplaceProduct';
+import { getFravegaProductsAction } from './actions/getFravegaProducts';
 import { getMegatoneProductsAction } from './actions/getMegatoneProducts';
 import { getOncityProductsAction } from './actions/getOncityProducts';
 
@@ -43,7 +44,12 @@ export function useMarketplaceProducts({ marketplaceId }: Params) {
 
         let response;
 
-        if (marketplaceId === 'megatone') {
+        if (marketplaceId === 'fravega') {
+          response = await getFravegaProductsAction({
+            offset,
+            limit: PAGE_SIZE,
+          });
+        } else if (marketplaceId === 'megatone') {
           response = await getMegatoneProductsAction({
             offset,
             limit: PAGE_SIZE,
@@ -60,7 +66,7 @@ export function useMarketplaceProducts({ marketplaceId }: Params) {
         setItems(response.items);
         setTotal(response.total);
         setPage(nextPage);
-      } catch (error) {
+      } catch {
       } finally {
         setLoading(false);
         setPaging(false);

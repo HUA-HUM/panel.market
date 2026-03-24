@@ -24,6 +24,8 @@ const TABS: { id: Tab; label: string; description: string }[] = [
 export default function MarketplaceDetailClient({ marketplace }: Props) {
   const [tab, setTab] = useState<Tab>('products');
   const router = useRouter();
+  const operationsMarketplaceId = getOperationsMarketplaceId(marketplace.id);
+  const supportsOperationsTabs = operationsMarketplaceId !== null;
 
   const activeIndex = TABS.findIndex(t => t.id === tab);
 
@@ -131,21 +133,45 @@ export default function MarketplaceDetailClient({ marketplace }: Props) {
         )}
 
         {tab === 'import' && (
-          <ImportProductsAction
-            marketplace={marketplace.id as 'megatone' | 'oncity'}
-          />
+          supportsOperationsTabs ? (
+            <ImportProductsAction
+              marketplace={operationsMarketplaceId}
+            />
+          ) : (
+            <MarketplaceFeaturePlaceholder
+              title="Imports not available yet"
+              description="Fravega product browsing is enabled. Import runs will be connected when the marketplace workflow is ready."
+            />
+          )
         )}
 
         {tab === 'actions' && (
-          <div>
-            <MarketplaceProductsHeader
-              marketplaceId={marketplace.id as 'megatone' | 'oncity'}
+          supportsOperationsTabs ? (
+            <div>
+              <MarketplaceProductsHeader
+                marketplaceId={operationsMarketplaceId}
+              />
+            </div>
+          ) : (
+            <MarketplaceFeaturePlaceholder
+              title="Status summary not available yet"
+              description="This section will show the publication status breakdown for Fravega once that endpoint is connected."
             />
-          </div>
+          )
         )}
       </div>
     </div>
   );
+}
+
+function getOperationsMarketplaceId(
+  marketplaceId: string
+): 'megatone' | 'oncity' | null {
+  if (marketplaceId === 'megatone' || marketplaceId === 'oncity') {
+    return marketplaceId;
+  }
+
+  return null;
 }
 
 /* =========================
@@ -171,5 +197,29 @@ function TabButton({
     >
       {children}
     </button>
+  );
+}
+
+function MarketplaceFeaturePlaceholder({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.03))] p-6">
+      <div className="max-w-xl space-y-3">
+        <span className="inline-flex w-fit items-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-zinc-300">
+          Coming soon
+        </span>
+        <h3 className="text-lg font-semibold text-white">
+          {title}
+        </h3>
+        <p className="text-sm text-zinc-400">
+          {description}
+        </p>
+      </div>
+    </div>
   );
 }

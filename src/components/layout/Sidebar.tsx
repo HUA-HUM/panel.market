@@ -93,7 +93,7 @@ export default function Sidebar() {
             />
             <SidebarLink
               href="/admin/products"
-              label="Products"
+              label="Orders"
               icon={<BoxIcon />}
               active={pathname.startsWith('/admin/products')}
               collapsed={collapsed}

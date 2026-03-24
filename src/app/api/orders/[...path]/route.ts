@@ -1,0 +1,42 @@
+import { NextRequest, NextResponse } from 'next/server';
+
+function getOrdersApiUrl(): string {
+  const baseUrl =
+    process.env.NEXT_PUBLIC_ORDERS_API_URL ?? process.env.ORDERS_API_URL;
+
+  if (!baseUrl) {
+    throw new Error('Orders API base URL is not configured.');
+  }
+
+  return baseUrl.replace(/\/$/, '');
+}
+
+export async function GET(
+  request: NextRequest,
+  context: { params: Promise<{ path: string[] }> }
+) {
+  const { path } = await context.params;
+  const upstreamUrl = new URL(
+    `${getOrdersApiUrl()}/orders/${path.join('/')}`
+  );
+
+  upstreamUrl.search = request.nextUrl.search;
+
+  const response = await fetch(upstreamUrl.toString(), {
+    method: 'GET',
+    headers: {
+      Accept: request.headers.get('accept') ?? '*/*',
+    },
+    cache: 'no-store',
+  });
+
+  const contentType = response.headers.get('content-type') ?? 'application/json';
+  const body = await response.text();
+
+  return new NextResponse(body, {
+    status: response.status,
+    headers: {
+      'Content-Type': contentType,
+    },
+  });
+}

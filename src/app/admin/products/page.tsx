@@ -1,3 +1,5 @@
+import ProductsClient from './ProductsClient';
+
 export default function Page() {
-  return <div>Orders</div>;
+  return <ProductsClient />;
 }
