@@ -10,18 +10,16 @@ export class GetPendingPublicationJobsRepository
   private readonly http: HttpClient;
 
   constructor(httpClient?: HttpClient) {
-    const baseUrl = process.env.NEXT_PUBLIC_MADRE_API_URL?.replace(/\/$/, '');
-
     this.http =
       httpClient ??
       new HttpClient({
-        baseUrl: baseUrl ?? '',
+        baseUrl: '/api',
       });
   }
 
   execute(limit = 10): Promise<PendingPublicationJob[]> {
     return this.http.get<PendingPublicationJob[]>(
-      `/api/publication-jobs/pending?limit=${limit}`
+      `/products/api/publication-jobs/pending?limit=${limit}`
     );
   }
 }

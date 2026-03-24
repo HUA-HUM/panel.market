@@ -10,18 +10,16 @@ export class GetPublicationRunProgressRepository
   private readonly http: HttpClient;
 
   constructor(httpClient?: HttpClient) {
-    const baseUrl = process.env.NEXT_PUBLIC_MADRE_API_URL?.replace(/\/$/, '');
-
     this.http =
       httpClient ??
       new HttpClient({
-        baseUrl: baseUrl ?? '',
+        baseUrl: '/api',
       });
   }
 
   execute(runId: string): Promise<PublicationRunProgress> {
     return this.http.get<PublicationRunProgress>(
-      `/api/publication-jobs/${runId}/progress`
+      `/products/api/publication-jobs/${runId}/progress`
     );
   }
 }

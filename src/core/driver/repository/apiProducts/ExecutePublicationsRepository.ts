@@ -7,12 +7,10 @@ export class ExecutePublicationsRepository
   private readonly http: HttpClient;
 
   constructor(httpClient?: HttpClient) {
-    const baseUrl = process.env.NEXT_PUBLIC_PRODUCTS_API_URL?.replace(/\/$/, '');
-
     this.http =
       httpClient ??
       new HttpClient({
-        baseUrl: baseUrl ?? '',
+        baseUrl: '/api',
       });
   }
 
@@ -26,7 +24,7 @@ export class ExecutePublicationsRepository
     totalJobs: number;
   }> {
     return this.http.post(
-      `/api/publications/execute/run`,
+      `/products/api/publications/execute/run`,
       data
     );
   }
