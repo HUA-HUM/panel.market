@@ -18,6 +18,6 @@ export class GetPublicationRunRepository
   }
 
   execute(runId: string): Promise<PublicationRun> {
-    return this.http.get<PublicationRun>(`/products/api/publication-runs/${runId}`);
+    return this.http.get<PublicationRun>(`/products/publication-runs/${runId}`);
   }
 }

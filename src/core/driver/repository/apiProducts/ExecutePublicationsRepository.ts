@@ -24,7 +24,7 @@ export class ExecutePublicationsRepository
     totalJobs: number;
   }> {
     return this.http.post(
-      `/products/api/publications/execute/run`,
+      `/products/publications/execute/run`,
       data
     );
   }

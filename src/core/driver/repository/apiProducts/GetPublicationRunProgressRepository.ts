@@ -19,7 +19,7 @@ export class GetPublicationRunProgressRepository
 
   execute(runId: string): Promise<PublicationRunProgress> {
     return this.http.get<PublicationRunProgress>(
-      `/products/api/publication-jobs/${runId}/progress`
+      `/products/publication-jobs/${runId}/progress`
     );
   }
 }
