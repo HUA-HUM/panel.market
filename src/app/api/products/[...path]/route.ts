@@ -8,7 +8,11 @@ function getProductsApiUrl(): string {
     throw new Error('Products API base URL is not configured.');
   }
 
-  return baseUrl.replace(/\/$/, '');
+  const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
+
+  return normalizedBaseUrl.endsWith('/api')
+    ? normalizedBaseUrl
+    : `${normalizedBaseUrl}/api`;
 }
 
 async function proxyRequest(
