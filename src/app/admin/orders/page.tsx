@@ -1,3 +1,5 @@
+import OrdersClient from './OrdersClient';
+
 export default function Page() {
-  return <div>Orders</div>;
+  return <OrdersClient />;
 }

@@ -93,9 +93,16 @@ export default function Sidebar() {
             />
             <SidebarLink
               href="/admin/products"
-              label="Orders"
+              label="Products"
               icon={<BoxIcon />}
               active={pathname.startsWith('/admin/products')}
+              collapsed={collapsed}
+            />
+            <SidebarLink
+              href="/admin/orders"
+              label="Orders"
+              icon={<ClipboardIcon />}
+              active={pathname.startsWith('/admin/orders')}
               collapsed={collapsed}
             />
             <SidebarLink
@@ -222,6 +229,16 @@ function PulseIcon() {
   return (
     <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
       <path d="M3 12h4l2.5-5 4 10 2.5-5H21" />
+    </svg>
+  );
+}
+
+function ClipboardIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M9 5h6" />
+      <path d="M9 3h6a2 2 0 0 1 2 2v1h2v15H5V6h2V5a2 2 0 0 1 2-2Z" />
+      <path d="M9 11h6M9 15h6" />
     </svg>
   );
 }

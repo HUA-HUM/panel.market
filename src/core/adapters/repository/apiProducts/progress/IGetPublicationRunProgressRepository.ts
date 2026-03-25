@@ -5,6 +5,8 @@ export type PublicationRunProgress = {
   processing: string;
   success: string;
   failed: string;
+  skipped?: string;
+  cancelled?: string;
 };
 
 export interface IGetPublicationRunProgressRepository {
