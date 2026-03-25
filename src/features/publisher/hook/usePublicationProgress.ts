@@ -74,48 +74,47 @@ export function usePublicationProgress(options?: UsePublicationProgressOptions) 
         new Set(pendingJobsResponse.map((job) => normalizeRunId(job.run_id)).filter(Boolean))
       );
 
+      let sortedActiveRuns: PublicationRun[] = [];
+
       if (uniquePendingRunIds.length > 0) {
         const activeRunsResponse = await Promise.all(
           uniquePendingRunIds.map((currentRunId) => runRepository.execute(currentRunId))
         );
-        const sortedActiveRuns = [...activeRunsResponse].sort((a, b) =>
+        sortedActiveRuns = [...activeRunsResponse].sort((a, b) =>
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
         setActiveRuns(sortedActiveRuns);
-
-        const autoSelectedRunId =
-          requestedRunId || sortedActiveRuns[0]?.id || '';
-
-        if (!requestedRunId && autoSelectedRunId) {
-          setRunId(autoSelectedRunId);
-        }
-
-        if (!autoSelectedRunId) {
-          setRun(null);
-          setProgress(null);
-          setRunJobs([]);
-          return;
-        }
-
-        const [runResponse, progressResponse, runJobsResponse] = await Promise.all([
-          runRepository.execute(autoSelectedRunId),
-          progressRepository.execute(autoSelectedRunId),
-          runJobsRepository.execute({
-            runId: autoSelectedRunId,
-            limit: 50,
-            offset: 0,
-          }),
-        ]);
-
-        setRun(runResponse);
-        setProgress(progressResponse);
-        setRunJobs(normalizeCollection<PublicationRunJob>(runJobsResponse));
       } else {
         setActiveRuns([]);
+      }
+
+      const autoSelectedRunId =
+        requestedRunId || sortedActiveRuns[0]?.id || '';
+
+      if (!requestedRunId && autoSelectedRunId) {
+        setRunId(autoSelectedRunId);
+      }
+
+      if (!autoSelectedRunId) {
         setRun(null);
         setProgress(null);
         setRunJobs([]);
+        return;
       }
+
+      const [runResponse, progressResponse, runJobsResponse] = await Promise.all([
+        runRepository.execute(autoSelectedRunId),
+        progressRepository.execute(autoSelectedRunId),
+        runJobsRepository.execute({
+          runId: autoSelectedRunId,
+          limit: 50,
+          offset: 0,
+        }),
+      ]);
+
+      setRun(runResponse);
+      setProgress(progressResponse);
+      setRunJobs(normalizeCollection<PublicationRunJob>(runJobsResponse));
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : 'No se pudo obtener el progreso de la publicación.';

@@ -51,8 +51,10 @@ function getStatusTone(status: string) {
   switch (status.toLowerCase()) {
     case 'success':
     case 'completed':
+    case 'completed with skips':
       return 'text-emerald-300 bg-emerald-400/10 border-emerald-400/15';
     case 'failed':
+    case 'completed with failures':
       return 'text-rose-300 bg-rose-400/10 border-rose-400/15';
     case 'skipped':
       return 'text-amber-300 bg-amber-400/10 border-amber-400/15';
@@ -64,6 +66,67 @@ function getStatusTone(status: string) {
     default:
       return 'text-zinc-300 bg-white/[0.05] border-white/10';
   }
+}
+
+function getRunMetrics(run: PublicationRun | null, progress: ReturnType<typeof usePublicationProgress>['progress']) {
+  if (!run) {
+    return null;
+  }
+
+  const total = toNumber(run.total_jobs ?? progress?.total);
+  const success = toNumber(run.actual_success_jobs ?? progress?.success ?? run.success_jobs);
+  const failed = toNumber(run.actual_failed_jobs ?? progress?.failed ?? run.failed_jobs);
+  const skipped = toNumber(run.skipped_jobs ?? progress?.skipped);
+  const cancelled = toNumber(run.cancelled_jobs ?? progress?.cancelled);
+  const pending = toNumber(run.pending_jobs ?? progress?.pending);
+  const processing = toNumber(run.processing_jobs ?? progress?.processing);
+  const retry = toNumber(run.retry_jobs);
+  const classifiedCompleted = success + failed + skipped + cancelled;
+  const settled = Math.max(classifiedCompleted, total - pending - processing);
+  const unknown = Math.max(0, settled - classifiedCompleted);
+  const completion = total > 0 ? Math.round((settled / total) * 100) : 0;
+
+  return {
+    total,
+    success,
+    failed,
+    skipped,
+    cancelled,
+    pending,
+    processing,
+    retry,
+    classifiedCompleted,
+    settled,
+    unknown,
+    completion,
+  };
+}
+
+function getDerivedRunStatus(
+  run: PublicationRun,
+  metrics: NonNullable<ReturnType<typeof getRunMetrics>>
+) {
+  if (metrics.processing > 0) {
+    return 'processing';
+  }
+
+  if (metrics.pending > 0) {
+    return 'pending';
+  }
+
+  if (metrics.failed > 0 && metrics.settled >= metrics.total) {
+    return 'completed with failures';
+  }
+
+  if (metrics.skipped > 0 && metrics.settled >= metrics.total) {
+    return 'completed with skips';
+  }
+
+  if (metrics.settled >= metrics.total) {
+    return 'completed';
+  }
+
+  return run.status;
 }
 
 function MetricCard({
@@ -123,35 +186,11 @@ export function PublicationProgressPanel({
     await refresh(nextRunId);
   };
 
-  const runMetrics = useMemo(() => {
-    if (!run) {
-      return null;
-    }
-
-    const total = toNumber(run.total_jobs ?? progress?.total);
-    const success = toNumber(run.actual_success_jobs ?? progress?.success ?? run.success_jobs);
-    const failed = toNumber(run.actual_failed_jobs ?? progress?.failed ?? run.failed_jobs);
-    const skipped = toNumber(run.skipped_jobs ?? progress?.skipped);
-    const cancelled = toNumber(run.cancelled_jobs ?? progress?.cancelled);
-    const pending = toNumber(run.pending_jobs ?? progress?.pending);
-    const processing = toNumber(run.processing_jobs ?? progress?.processing);
-    const retry = toNumber(run.retry_jobs);
-    const completed = success + failed + skipped + cancelled;
-    const completion = total > 0 ? Math.round((completed / total) * 100) : 0;
-
-    return {
-      total,
-      success,
-      failed,
-      skipped,
-      cancelled,
-      pending,
-      processing,
-      retry,
-      completed,
-      completion,
-    };
-  }, [run, progress]);
+  const runMetrics = useMemo(() => getRunMetrics(run, progress), [run, progress]);
+  const derivedStatus = useMemo(
+    () => (run && runMetrics ? getDerivedRunStatus(run, runMetrics) : 'idle'),
+    [run, runMetrics]
+  );
 
   const reasonSummary = useMemo(() => {
     const grouped = new Map<string, number>();
@@ -329,12 +368,12 @@ export function PublicationProgressPanel({
               <MetricCard
                 label="Run"
                 value={`#${run.id}`}
-                hint={run.status}
+                hint={derivedStatus}
               />
               <MetricCard
                 label="Progress"
                 value={`${runMetrics.completion}%`}
-                hint={`${runMetrics.completed} of ${runMetrics.total} jobs resolved`}
+                hint={`${runMetrics.settled} of ${runMetrics.total} jobs settled`}
               />
               <MetricCard
                 label="Success"
@@ -373,8 +412,8 @@ export function PublicationProgressPanel({
                     </p>
                   </div>
 
-                  <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-zinc-300">
-                    {run.status}
+                  <div className={`rounded-full border px-3 py-1 text-xs ${getStatusTone(derivedStatus)}`}>
+                    {derivedStatus}
                   </div>
                 </div>
 
@@ -391,6 +430,12 @@ export function PublicationProgressPanel({
                   <div className="rounded-2xl bg-white/[0.04] px-4 py-3">Cancelled: {runMetrics.cancelled}</div>
                   <div className="rounded-2xl bg-white/[0.04] px-4 py-3">Retry: {runMetrics.retry}</div>
                 </div>
+
+                {runMetrics.unknown > 0 && (
+                  <p className="mt-4 text-xs text-zinc-500">
+                    {runMetrics.unknown} jobs were resolved by the backend but are not classified yet in success, failed or skipped.
+                  </p>
+                )}
               </div>
 
               <div className="rounded-[24px] border border-white/10 bg-black/20 p-5">

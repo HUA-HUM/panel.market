@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { PublishPanel } from '@/src/features/publisher/components/PublishModal';
-import { PublicationProgressPanel } from '@/src/features/publisher/components/PublicationProgressPanel';
+import { PublicationJobsPanel } from '@/src/features/publisher/components/PublicationJobsPanel';
+import { PublicationRunsPanel } from '@/src/features/publisher/components/PublicationRunsPanel';
 
-type PublishTab = 'publish' | 'progress';
+type PublishTab = 'publish' | 'runs' | 'jobs';
 
 const TABS: Array<{
   id: PublishTab;
@@ -17,9 +18,14 @@ const TABS: Array<{
     description: 'Create a new publication run.'
   },
   {
-    id: 'progress',
-    label: 'Track',
-    description: 'Monitor run progress and pending jobs.'
+    id: 'runs',
+    label: 'Runs',
+    description: 'Review all publication runs.'
+  },
+  {
+    id: 'jobs',
+    label: 'Jobs',
+    description: 'Inspect SKU jobs grouped by run.'
   }
 ];
 
@@ -48,7 +54,7 @@ export default function PublishClient() {
         </section>
 
         <section className="rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
-          <div className="grid gap-2 md:grid-cols-2">
+          <div className="grid gap-2 md:grid-cols-3">
             {TABS.map((item) => {
               const active = item.id === tab;
 
@@ -89,7 +95,7 @@ export default function PublishClient() {
                         }
                       `}
                     >
-                      {active ? 'ON' : item.id === 'publish' ? 'L' : 'T'}
+                      {active ? 'ON' : item.id === 'publish' ? 'L' : item.id === 'runs' ? 'R' : 'J'}
                     </div>
                   </div>
                 </button>
@@ -103,13 +109,27 @@ export default function PublishClient() {
             <PublishPanel
               onRunCreated={(runId) => {
                 setActiveRunId(String(runId));
-                setTab('progress');
+                setTab('runs');
               }}
             />
           )}
 
-          {tab === 'progress' && (
-            <PublicationProgressPanel initialRunId={activeRunId} />
+          {tab === 'runs' && (
+            <PublicationRunsPanel
+              activeRunId={activeRunId}
+              onSelectRun={(runId) => {
+                setActiveRunId(runId);
+              }}
+            />
+          )}
+
+          {tab === 'jobs' && (
+            <PublicationJobsPanel
+              activeRunId={activeRunId}
+              onSelectRun={(runId) => {
+                setActiveRunId(runId);
+              }}
+            />
           )}
         </section>
       </div>
