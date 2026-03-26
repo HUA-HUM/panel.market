@@ -12,6 +12,9 @@ type FravegaApiResponse = {
     stock: number;
     status: string;
     last_seen_at?: string;
+    images?: string[];
+    link_publicacion?: string;
+    title?: string;
     raw_payload?: {
       price?: number | string;
       stock?: number;
@@ -30,6 +33,8 @@ type FravegaApiResponse = {
   hasNext?: boolean;
   nextOffset?: number;
 };
+
+const FRAVEGA_IMAGE_BASE_URL = 'https://images2.production.fravega.com/f300';
 
 export class GetFravegaProductsRepository
   implements IGetFravegaProductsRepository
@@ -92,15 +97,42 @@ function mapFravegaItemToMarketplaceProduct(
     marketSku: raw.marketSku,
     title:
       raw.title?.trim() ||
+      item.title?.trim() ||
       raw.sellerSku?.trim() ||
       item.seller_sku ||
       item.external_id,
     price: Number(raw.price ?? item.price ?? 0),
     stock: raw.stock ?? item.stock ?? 0,
     status: mapFravegaStatus(raw.status ?? item.status),
-    publicationUrl: raw.linkPublicacion,
-    images: raw.images ?? [],
+    publicationUrl: raw.linkPublicacion ?? item.link_publicacion,
+    images: normalizeFravegaImages(raw.images ?? item.images),
   };
+}
+
+function normalizeFravegaImages(images?: string[]): string[] {
+  if (!Array.isArray(images)) {
+    return [];
+  }
+
+  return images
+    .map((image) => {
+      if (typeof image !== 'string') {
+        return null;
+      }
+
+      const normalizedImage = image.trim();
+
+      if (!normalizedImage) {
+        return null;
+      }
+
+      if (/^https?:\/\//i.test(normalizedImage)) {
+        return normalizedImage;
+      }
+
+      return `${FRAVEGA_IMAGE_BASE_URL}/${normalizedImage}`;
+    })
+    .filter((image): image is string => Boolean(image));
 }
 
 function mapFravegaStatus(status: string): MarketplaceProduct['status'] {

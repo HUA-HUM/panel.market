@@ -1,5 +1,5 @@
 import { MarketplaceProduct } from '@/src/core/entitis/marketplace/shared/products/get/MarketplaceProduct';
-import Image from 'next/image';
+import { useState } from 'react';
 
 type Props = {
   product: MarketplaceProduct;
@@ -9,6 +9,7 @@ const PLACEHOLDER_IMAGE =
   'https://tiendaloquieroaca924.vtexassets.com/assets/vtex.catalog-images/products/examplePhoneImageBlue.png';
 
 export function MarketplaceProductCard({ product }: Props) {
+  const [imageFailed, setImageFailed] = useState(false);
   const image =
     product.images?.[0] &&
     product.images[0] !== PLACEHOLDER_IMAGE
@@ -54,13 +55,15 @@ export function MarketplaceProductCard({ product }: Props) {
       "
     >
       <div className="relative flex h-24 w-full items-center justify-center overflow-hidden rounded-xl bg-white/[0.04]">
-        {image ? (
-          <Image
+        {image && !imageFailed ? (
+          // Marketplace image URLs can be inconsistent; a plain img is more tolerant here.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
             src={image}
             alt={product.title}
-            fill
-            sizes="(max-width: 1280px) 14vw"
-            className="object-contain p-2 transition-transform group-hover:scale-105"
+            loading="lazy"
+            className="h-full w-full object-contain p-2 transition-transform group-hover:scale-105"
+            onError={() => setImageFailed(true)}
           />
         ) : (
           <div className="text-center px-2">

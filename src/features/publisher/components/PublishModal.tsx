@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { useFolders } from '../hook/useFolders';
 import {
@@ -24,6 +24,7 @@ const MARKETPLACES = [
 
 type PublishPanelProps = {
   onRunCreated?: (runId: string) => void;
+  onLaunchStarted?: () => void;
 };
 
 function SummaryRow({
@@ -45,7 +46,7 @@ function SummaryRow({
   );
 }
 
-export function PublishPanel({ onRunCreated }: PublishPanelProps) {
+export function PublishPanel({ onRunCreated, onLaunchStarted }: PublishPanelProps) {
   const {
     folders,
     loading: loadingFolders,
@@ -53,28 +54,42 @@ export function PublishPanel({ onRunCreated }: PublishPanelProps) {
     refetch
   } = useFolders();
   const { execute, loading, error } = useExecutePublications();
+  const isMountedRef = useRef(true);
 
   const [selectedFolder, setSelectedFolder] = useState<number | null>(null);
   const [selectedMarketplaces, setSelectedMarketplaces] = useState<string[]>([]);
   const [validationMessage, setValidationMessage] = useState<string | null>(null);
   const [result, setResult] = useState<ExecutePublicationsResponse | null>(null);
+  const [launchInBackground, setLaunchInBackground] = useState(false);
+  const [uiSubmitting, setUiSubmitting] = useState(false);
   const selectedFolderName =
     folders.find((folder) => folder.id === selectedFolder)?.name ?? null;
   const selectedMarketplaceLabels = MARKETPLACES
     .filter((marketplace) => selectedMarketplaces.includes(marketplace.id))
     .map((marketplace) => marketplace.label);
-  const statusMessage = loading
-    ? 'Launching run'
+  const statusMessage = uiSubmitting
+    ? 'Sending launch request'
+    : launchInBackground
+      ? 'Initializing in background'
+    : loading
+      ? 'Launching run'
     : result
       ? 'Run created'
       : 'Waiting for configuration';
 
   const isSubmitDisabled =
-    loading || loadingFolders || !selectedFolder || selectedMarketplaces.length === 0;
+    uiSubmitting || loadingFolders || !selectedFolder || selectedMarketplaces.length === 0;
+
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const toggleMarketplace = (id: string) => {
     setValidationMessage(null);
     setResult(null);
+    setLaunchInBackground(false);
     setSelectedMarketplaces(prev =>
       prev.includes(id)
         ? prev.filter(m => m !== id)
@@ -99,16 +114,55 @@ export function PublishPanel({ onRunCreated }: PublishPanelProps) {
 
     try {
       setValidationMessage(null);
-      const res = await execute({
+      setLaunchInBackground(false);
+      setUiSubmitting(true);
+
+      let resolved = false;
+      let movedToBackground = false;
+
+      const requestPromise = execute({
         marketplaces: selectedMarketplaces,
         folderId: selectedFolder
       });
-      setResult(res);
+
+      const backgroundTimer = window.setTimeout(() => {
+        if (resolved || movedToBackground) {
+          return;
+        }
+
+        movedToBackground = true;
+
+        if (isMountedRef.current) {
+          setUiSubmitting(false);
+          setLaunchInBackground(true);
+        }
+
+        toast.info('Run initialization started', {
+          description: 'The backend is processing the SKU batches. Follow the run from the Runs tab while it continues in background.',
+        });
+        onLaunchStarted?.();
+      }, 1800);
+
+      const res = await requestPromise;
+      resolved = true;
+      window.clearTimeout(backgroundTimer);
+
+      if (isMountedRef.current) {
+        setUiSubmitting(false);
+        setLaunchInBackground(false);
+        setResult(res);
+      }
+
       toast.success('Publication run created', {
         description: `Run #${res.runId} is now available in the progress view.`,
       });
       onRunCreated?.(res.runId);
     } catch (err: unknown) {
+      if (isMountedRef.current) {
+        setUiSubmitting(false);
+        setLaunchInBackground(false);
+      }
+
       const message =
         err instanceof Error
           ? err.message

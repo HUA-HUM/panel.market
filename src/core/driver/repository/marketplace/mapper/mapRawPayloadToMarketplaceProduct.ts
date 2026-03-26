@@ -4,12 +4,13 @@ type RawPayload = {
   publicationId: number | string;
   sellerSku: string;
   marketSku?: string;
-  title: string;
+  title?: string;
   price: number;
   stock: number;
   status: string;
   images?: string[];
   linkPublicacion?: string;
+  [key: string]: unknown;
 };
 
 export function mapRawPayloadToMarketplaceProduct(
@@ -19,13 +20,107 @@ export function mapRawPayloadToMarketplaceProduct(
     publicationId: raw.publicationId,
     sellerSku: raw.sellerSku,
     marketSku: raw.marketSku,
-    title: raw.title,
+    title: resolveTitle(raw),
     price: Number(raw.price),
     stock: raw.stock,
     status: mapStatus(raw.status),
-    publicationUrl: raw.linkPublicacion,
-    images: raw.images ?? [],
+    publicationUrl: resolvePublicationUrl(raw),
+    images: resolveImages(raw),
   };
+}
+
+function resolveTitle(raw: RawPayload): string {
+  const directCandidates = [raw.title, raw.nombre, raw.name, raw.productName];
+
+  for (const candidate of directCandidates) {
+    if (typeof candidate === 'string' && candidate.trim()) {
+      return candidate.trim();
+    }
+  }
+
+  return String(raw.sellerSku ?? raw.publicationId ?? 'Untitled product');
+}
+
+function resolvePublicationUrl(raw: RawPayload): string | undefined {
+  const candidates = [
+    raw.linkPublicacion,
+    raw.publicationUrl,
+    raw.productUrl,
+    raw.urlPublicacion,
+    raw.url,
+    raw.permalink,
+  ];
+
+  for (const candidate of candidates) {
+    if (typeof candidate === 'string' && candidate.trim()) {
+      return candidate.trim();
+    }
+  }
+
+  return undefined;
+}
+
+function resolveImages(raw: RawPayload): string[] {
+  const arrayCandidates = [
+    raw.images,
+    raw.imageUrls,
+    raw.image_urls,
+    raw.pictures,
+    raw.fotos,
+  ];
+
+  for (const candidate of arrayCandidates) {
+    if (Array.isArray(candidate)) {
+      const mapped = candidate
+        .map((entry) => {
+          if (typeof entry === 'string') {
+            return entry.trim();
+          }
+
+          if (entry && typeof entry === 'object') {
+            const objectEntry = entry as Record<string, unknown>;
+            const nestedCandidates = [
+              objectEntry.url,
+              objectEntry.src,
+              objectEntry.link,
+              objectEntry.image,
+            ];
+
+            return nestedCandidates.find(
+              (value): value is string => typeof value === 'string' && value.trim().length > 0
+            )?.trim();
+          }
+
+          return undefined;
+        })
+        .filter((value): value is string => Boolean(value));
+
+      if (mapped.length > 0) {
+        return mapped;
+      }
+    }
+  }
+
+  const singleCandidates = [
+    raw.image,
+    raw.imageUrl,
+    raw.image_url,
+    raw.thumbnail,
+    raw.linkImagen,
+    raw.urlImagen,
+    raw.imagen,
+    raw.foto,
+    raw.imagenPrincipal,
+    raw.fotoPrincipal,
+  ];
+
+  for (const candidate of singleCandidates) {
+    if (typeof candidate === 'string' && candidate.trim()) {
+      return [candidate.trim()];
+    }
+  }
+
+  return [];
 }
 
 function mapStatus(status: string): MarketplaceProduct['status'] {

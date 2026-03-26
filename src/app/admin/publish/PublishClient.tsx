@@ -107,6 +107,9 @@ export default function PublishClient() {
         <section className="space-y-6">
           {tab === 'publish' && (
             <PublishPanel
+              onLaunchStarted={() => {
+                setTab('runs');
+              }}
               onRunCreated={(runId) => {
                 setActiveRunId(String(runId));
                 setTab('runs');
