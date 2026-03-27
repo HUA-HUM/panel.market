@@ -4,6 +4,6 @@ import {
 
 export interface IImportProductsRepository {
   execute(params: {
-    marketplace: 'megatone' | 'oncity';
+    marketplace: 'megatone' | 'oncity' | 'fravega';
   }): Promise<ImportProductsResponse>;
 }

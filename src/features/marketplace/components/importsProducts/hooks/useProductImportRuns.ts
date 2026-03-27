@@ -6,7 +6,7 @@ import { IGetProductImportRunsRepository } from '@/src/core/adapters/repository/
 import { GetProductSyncRunsRepository } from '@/src/core/driver/repository/marketplace/shared/imports/get/GetProductImportRunsRepository';
 
 type Params = {
-  marketplace: 'megatone' | 'oncity';
+  marketplace: 'megatone' | 'oncity' | 'fravega';
 };
 
 export function useProductImportRuns({ marketplace }: Params) {
@@ -14,8 +14,6 @@ export function useProductImportRuns({ marketplace }: Params) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-
     const repository: IGetProductImportRunsRepository =
       new GetProductSyncRunsRepository();
 
@@ -42,7 +40,7 @@ export function useProductImportRuns({ marketplace }: Params) {
     };
 
     fetchRuns();
-    interval = setInterval(fetchRuns, 10_000);
+    const interval = setInterval(fetchRuns, 10_000);
 
     return () => clearInterval(interval);
   }, [marketplace]);

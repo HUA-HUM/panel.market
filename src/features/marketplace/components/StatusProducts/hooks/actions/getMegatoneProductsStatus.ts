@@ -4,7 +4,7 @@ import { IGetMegatoneProductsStatusRepository } from '@/src/core/adapters/reposi
 import { StatusMegatoneProductRepository } from '@/src/core/driver/repository/marketplace/megatone/product/status/StatusMegatoneProductRepository';
 
 export async function getMegatoneProductsStatusAction(params?: {
-  status?: 'ACTIVE' | 'PAUSED' | 'DELETED';
+  status?: 'ACTIVE' | 'PAUSED' | 'PENDING' | 'DELETED';
 }) {
   const repo: IGetMegatoneProductsStatusRepository =
     new StatusMegatoneProductRepository();

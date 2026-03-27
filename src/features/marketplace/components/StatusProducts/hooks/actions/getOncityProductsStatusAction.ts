@@ -4,7 +4,7 @@ import { IGetOncityProductsStatusRepository } from '@/src/core/adapters/reposito
 import { StatusOncityProductRepository } from '@/src/core/driver/repository/marketplace/oncity/product/status/StatusOncityProductRepository';
 
 export async function getOncityProductsStatusAction(params?: {
-  status?: 'ACTIVE' | 'PAUSED' | 'DELETED';
+  status?: 'ACTIVE' | 'PAUSED' | 'PENDING' | 'DELETED';
 }) {
   const repo: IGetOncityProductsStatusRepository =
     new StatusOncityProductRepository();

@@ -16,16 +16,18 @@ type Props = {
 type Tab = 'products' | 'import' | 'actions';
 
 const TABS: { id: Tab; label: string; description: string }[] = [
-  { id: 'products', label: 'Products', description: 'Browse live marketplace items.' },
-  { id: 'import', label: 'Imports', description: 'Sync marketplace catalog data.' },
-  { id: 'actions', label: 'Status', description: 'Review publication state summary.' },
+  { id: 'products', label: 'Products', description: 'Browse the current marketplace catalog.' },
+  { id: 'import', label: 'Imports', description: 'Trigger catalog sync operations.' },
+  { id: 'actions', label: 'Status', description: 'Review publication distribution and totals.' },
 ];
 
 export default function MarketplaceDetailClient({ marketplace }: Props) {
   const [tab, setTab] = useState<Tab>('products');
   const router = useRouter();
-  const operationsMarketplaceId = getOperationsMarketplaceId(marketplace.id);
-  const supportsOperationsTabs = operationsMarketplaceId !== null;
+  const supportsImports =
+    marketplace.id === 'megatone' ||
+    marketplace.id === 'oncity' ||
+    marketplace.id === 'fravega';
 
   const activeIndex = TABS.findIndex(t => t.id === tab);
 
@@ -133,9 +135,9 @@ export default function MarketplaceDetailClient({ marketplace }: Props) {
         )}
 
         {tab === 'import' && (
-          supportsOperationsTabs ? (
+          supportsImports ? (
             <ImportProductsAction
-              marketplace={operationsMarketplaceId}
+              marketplace={marketplace.id as 'megatone' | 'oncity' | 'fravega'}
             />
           ) : (
             <MarketplaceFeaturePlaceholder
@@ -146,32 +148,15 @@ export default function MarketplaceDetailClient({ marketplace }: Props) {
         )}
 
         {tab === 'actions' && (
-          supportsOperationsTabs ? (
-            <div>
-              <MarketplaceProductsHeader
-                marketplaceId={operationsMarketplaceId}
-              />
-            </div>
-          ) : (
-            <MarketplaceFeaturePlaceholder
-              title="Status summary not available yet"
-              description="This section will show the publication status breakdown for Fravega once that endpoint is connected."
+          <div>
+            <MarketplaceProductsHeader
+              marketplaceId={marketplace.id}
             />
-          )
+          </div>
         )}
       </div>
     </div>
   );
-}
-
-function getOperationsMarketplaceId(
-  marketplaceId: string
-): 'megatone' | 'oncity' | null {
-  if (marketplaceId === 'megatone' || marketplaceId === 'oncity') {
-    return marketplaceId;
-  }
-
-  return null;
 }
 
 /* =========================

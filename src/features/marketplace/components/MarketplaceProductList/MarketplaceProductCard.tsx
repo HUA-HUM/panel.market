@@ -20,30 +20,41 @@ export function MarketplaceProductCard({ product }: Props) {
     ?.toString()
     .toUpperCase()
     .trim();
+  const rawStatusLabel = product.rawStatus?.trim() || normalizedStatus;
 
   let statusBadge =
     'bg-white/[0.08] text-zinc-300';
 
-  let statusLabel = normalizedStatus ?? 'Desconocido';
+  let statusLabel = rawStatusLabel ?? 'Desconocido';
 
   switch (normalizedStatus) {
     case 'ACTIVE':
     case 'ACTIVO':
       statusBadge = 'bg-green-100 text-green-700';
-      statusLabel = 'Activo';
+      statusLabel = rawStatusLabel ?? 'Activo';
       break;
 
     case 'PAUSED':
     case 'PAUSADO':
     case 'INACTIVE':
       statusBadge = 'bg-yellow-100 text-yellow-700';
-      statusLabel = 'Pausado';
+      statusLabel = rawStatusLabel ?? 'Pausado';
+      break;
+
+    case 'PENDING':
+      statusBadge = 'bg-sky-100 text-sky-700';
+      statusLabel = rawStatusLabel ?? 'Pendiente';
+      break;
+
+    case 'OTHER':
+      statusBadge = 'bg-violet-100 text-violet-700';
+      statusLabel = rawStatusLabel ?? 'En revisión';
       break;
 
     case 'DELETED':
     case 'ELIMINADO':
       statusBadge = 'bg-red-100 text-red-700';
-      statusLabel = 'Eliminado';
+      statusLabel = rawStatusLabel ?? 'Eliminado';
       break;
   }
 
@@ -54,9 +65,19 @@ export function MarketplaceProductCard({ product }: Props) {
       transition-all hover:border-white/20 hover:bg-white/[0.03]
       "
     >
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <span className="truncate text-[10px] text-zinc-500">
+          {product.marketSku || product.sellerSku}
+        </span>
+        <span
+          className={`rounded-md px-2 py-0.5 text-[10px] font-medium ${statusBadge}`}
+        >
+          {statusLabel}
+        </span>
+      </div>
+
       <div className="relative flex h-24 w-full items-center justify-center overflow-hidden rounded-xl bg-white/[0.04]">
         {image && !imageFailed ? (
-          // Marketplace image URLs can be inconsistent; a plain img is more tolerant here.
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={image}
@@ -78,7 +99,8 @@ export function MarketplaceProductCard({ product }: Props) {
       </div>
       <div className="mt-2 space-y-1">
         <div className="truncate text-[10px] text-zinc-500">
-          {product.sellerSku} · {product.publicationId}
+          {product.sellerSku}
+          {product.externalId ? ` · ${product.externalId}` : ''}
         </div>
         <div className="line-clamp-2 text-xs font-semibold leading-tight text-white">
           {product.title}
@@ -92,12 +114,8 @@ export function MarketplaceProductCard({ product }: Props) {
           Stock {product.stock}
         </span>
       </div>
-      <div className="mt-2 flex items-center justify-between">
-        <span
-          className={`rounded-md px-2 py-0.5 text-[10px] font-medium ${statusBadge}`}
-        >
-          {statusLabel}
-        </span>
+      <div className="mt-2 text-[10px] text-zinc-500">
+        Last seen {formatLastSeenAt(product.lastSeenAt)}
       </div>
       {product.publicationUrl && (
         <a
@@ -115,4 +133,24 @@ export function MarketplaceProductCard({ product }: Props) {
       )}
     </div>
   );
+}
+
+function formatLastSeenAt(lastSeenAt?: string) {
+  if (!lastSeenAt) {
+    return 'not available';
+  }
+
+  const date = new Date(lastSeenAt);
+
+  if (Number.isNaN(date.getTime())) {
+    return 'not available';
+  }
+
+  return new Intl.DateTimeFormat('es-AR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date);
 }

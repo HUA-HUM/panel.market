@@ -1,16 +1,33 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { MarketplaceProductsStatus } from '@/src/core/entitis/marketplace/shared/products/status/MarketplaceProductsStatus';
+import {
+  MarketplaceProductsStatus,
+  MarketplaceProductsStatusSummary,
+} from '@/src/core/entitis/marketplace/shared/products/status/MarketplaceProductsStatus';
 
 type Params = {
-  marketplace: 'megatone' | 'oncity';
+  marketplace: string;
+};
+
+type StatusResponse = {
+  marketplace?: string;
+  total?: number | string;
+  statuses?: Array<{
+    status: string;
+    total: number | string;
+    percentage?: number | string;
+  }>;
+  statusMap?: Record<string, number>;
+  statusPercentageMap?: Record<string, number>;
 };
 
 export function useMarketplaceProductsStatus({
   marketplace,
 }: Params) {
   const [items, setItems] = useState<MarketplaceProductsStatus[]>([]);
+  const [summary, setSummary] =
+    useState<MarketplaceProductsStatusSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,17 +41,30 @@ export function useMarketplaceProductsStatus({
           { cache: 'no-store' }
         );
 
-        const data = await res.json();
+        const data = (await res.json()) as StatusResponse;
 
         if (!mounted) return;
 
-        setItems(
-          data.map((item: any) => ({
-            status: item.status,
-            total: Number(item.total),
-          }))
-        );
-      } catch (e) {
+        const normalizedItems = Array.isArray(data?.statuses)
+          ? data.statuses.map(item => ({
+              status: item.status,
+              total: Number(item.total ?? 0),
+              percentage: Number(item.percentage ?? 0),
+            }))
+          : [];
+
+        setItems(normalizedItems);
+        setSummary({
+          marketplace: data?.marketplace ?? marketplace,
+          total: Number(data?.total ?? 0),
+          statuses: normalizedItems,
+          statusMap: data?.statusMap ?? {},
+          statusPercentageMap: data?.statusPercentageMap ?? {},
+        });
+      } catch {
+        if (!mounted) return;
+        setItems([]);
+        setSummary(null);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -49,6 +79,7 @@ export function useMarketplaceProductsStatus({
 
   return {
     items,
+    summary,
     loading,
   };
 }

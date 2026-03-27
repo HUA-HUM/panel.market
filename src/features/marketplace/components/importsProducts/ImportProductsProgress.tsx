@@ -11,16 +11,21 @@ type Props = {
 
 export function ImportProductsProgress({ run }: Props) {
   const isRunning =
-    run.status === 'STARTED' || run.status === 'RUNNING';
+    run.status === 'QUEUED' ||
+    run.status === 'STARTED' ||
+    run.status === 'RUNNING';
 
   const progress =
     run.status === 'SUCCESS'
       ? 100
       : run.status === 'FAILED'
       ? 100
+      : run.status === 'QUEUED'
+      ? 5
       : Math.min(run.batches_processed * 5, 95);
 
   const statusStyles: Record<ProductImportRunStatus, string> = {
+    QUEUED: 'bg-sky-400/15 text-sky-100',
     STARTED: 'bg-cyan-400/15 text-cyan-100',
     RUNNING: 'bg-cyan-400/15 text-cyan-100',
     SUCCESS: 'bg-emerald-400/15 text-emerald-100',
@@ -28,6 +33,7 @@ export function ImportProductsProgress({ run }: Props) {
   };
 
   const progressBarColors: Record<ProductImportRunStatus, string> = {
+    QUEUED: 'bg-sky-400',
     STARTED: 'bg-cyan-400',
     RUNNING: 'bg-cyan-400',
     SUCCESS: 'bg-emerald-400',

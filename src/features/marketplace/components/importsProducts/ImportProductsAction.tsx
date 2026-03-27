@@ -6,7 +6,7 @@ import { useProductImportRuns } from './hooks/useProductImportRuns';
 import { ImportProductsProgress } from './ImportProductsProgress';
 
 type Props = {
-  marketplace: 'megatone' | 'oncity';
+  marketplace: 'megatone' | 'oncity' | 'fravega';
 };
 
 export function ImportProductsAction({ marketplace }: Props) {
@@ -23,6 +23,7 @@ export function ImportProductsAction({ marketplace }: Props) {
 
   const isImportRunning =
     runImportLoading ||
+    latestRun?.status === 'QUEUED' ||
     latestRun?.status === 'STARTED' ||
     latestRun?.status === 'RUNNING';
 
@@ -67,11 +68,16 @@ export function ImportProductsAction({ marketplace }: Props) {
         </div>
       )}
 
-      {(latestRun?.status === 'STARTED' ||
+      {(latestRun?.status === 'QUEUED' ||
+        latestRun?.status === 'STARTED' ||
         latestRun?.status === 'RUNNING') && (
         <div className="flex items-center gap-3 text-sm text-zinc-300">
           <BrandSpinner size={18} />
-          <span>Import in progress...</span>
+          <span>
+            {latestRun?.status === 'QUEUED'
+              ? 'Import queued...'
+              : 'Import in progress...'}
+          </span>
         </div>
       )}
 

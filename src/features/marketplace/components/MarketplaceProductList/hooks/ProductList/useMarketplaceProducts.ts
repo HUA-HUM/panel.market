@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { MarketplaceProduct } from '@/src/core/entitis/marketplace/shared/products/get/MarketplaceProduct';
+import { MarketplaceProductsListSummary } from '@/src/core/entitis/marketplace/shared/products/get/pagination/PaginatedResult';
 import { getFravegaProductsAction } from './actions/getFravegaProducts';
 import { getMegatoneProductsAction } from './actions/getMegatoneProducts';
 import { getOncityProductsAction } from './actions/getOncityProducts';
@@ -16,6 +17,9 @@ export function useMarketplaceProducts({ marketplaceId }: Params) {
   const [items, setItems] = useState<MarketplaceProduct[]>([]);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const [count, setCount] = useState(0);
+  const [summary, setSummary] =
+    useState<MarketplaceProductsListSummary | null>(null);
 
   // loaders separados
   const [loading, setLoading] = useState(false); // carga inicial / refresh
@@ -23,7 +27,7 @@ export function useMarketplaceProducts({ marketplaceId }: Params) {
 
   const hasFetchedRef = useRef(false);
 
-  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const fetchPage = useCallback(
     async (nextPage: number) => {
@@ -65,6 +69,8 @@ export function useMarketplaceProducts({ marketplaceId }: Params) {
 
         setItems(response.items);
         setTotal(response.total);
+        setCount(response.count ?? response.items.length);
+        setSummary(response.summary ?? null);
         setPage(nextPage);
       } catch {
       } finally {
@@ -91,6 +97,8 @@ export function useMarketplaceProducts({ marketplaceId }: Params) {
     items,
     page,
     total,
+    count,
+    summary,
     totalPages,
 
     // estados

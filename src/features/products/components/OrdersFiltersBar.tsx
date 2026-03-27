@@ -17,7 +17,7 @@ type Props = {
 
 const PRESETS: Array<{ label: string; value: Exclude<OrdersPreset, 'custom'> }> = [
   { label: 'Last 24h', value: 'last24' },
-  { label: '24h', value: 24 },
+  //{ label: '24h', value: 24 },
   { label: '48h', value: 48 },
   { label: '72h', value: 72 },
   { label: 'Historical', value: 'historical' },

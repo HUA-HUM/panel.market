@@ -2,6 +2,6 @@ import { MarketplaceProductsStatus } from '@/src/core/entitis/marketplace/shared
 
 export interface IGetOncityProductsStatusRepository {
   execute(params?: {
-    status?: 'ACTIVE' | 'PAUSED' | 'DELETED';
+    status?: 'ACTIVE' | 'PAUSED' | 'PENDING' | 'DELETED';
   }): Promise<MarketplaceProductsStatus[]>;
 }

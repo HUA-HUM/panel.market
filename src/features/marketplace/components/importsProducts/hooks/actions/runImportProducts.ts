@@ -3,10 +3,10 @@
 import { IImportProductsRepository } from '@/src/core/adapters/repository/marketplace/shared/import/post/IImportProductsRepository';
 import { ImportProductsRepository } from '@/src/core/driver/repository/marketplace/shared/imports/post/ImportProductsRepository';
 
-export type RunImportStatus = 'STARTED' | 'SUCCESS' | 'FAILED';
+export type RunImportStatus = 'QUEUED' | 'STARTED' | 'SUCCESS' | 'FAILED';
 
 type Params = {
-  marketplace: 'megatone' | 'oncity';
+  marketplace: 'megatone' | 'oncity' | 'fravega';
 };
 
 export async function runImportProductsAction(

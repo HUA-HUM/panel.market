@@ -3,7 +3,7 @@
 import { MarketplaceProductsStatusSummary } from '@/src/features/marketplace/components/StatusProducts/MarketplaceProductsStatusSummary';
 
 type Props = {
-  marketplaceId: 'megatone' | 'oncity';
+  marketplaceId: string;
 };
 
 export function MarketplaceProductsHeader({
@@ -16,7 +16,7 @@ export function MarketplaceProductsHeader({
           Publication status
         </h3>
         <p className="text-xs text-zinc-500">
-          Live summary of marketplace publication states.
+          Live distribution of publication states and current share by status.
         </p>
       </div>
       <MarketplaceProductsStatusSummary

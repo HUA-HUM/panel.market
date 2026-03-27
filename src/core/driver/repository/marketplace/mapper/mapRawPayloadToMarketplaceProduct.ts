@@ -20,12 +20,15 @@ export function mapRawPayloadToMarketplaceProduct(
     publicationId: raw.publicationId,
     sellerSku: raw.sellerSku,
     marketSku: raw.marketSku,
+    externalId: resolveExternalId(raw),
     title: resolveTitle(raw),
     price: Number(raw.price),
     stock: raw.stock,
     status: mapStatus(raw.status),
+    rawStatus: resolveRawStatus(raw.status),
     publicationUrl: resolvePublicationUrl(raw),
     images: resolveImages(raw),
+    lastSeenAt: resolveLastSeenAt(raw),
   };
 }
 
@@ -44,11 +47,48 @@ function resolveTitle(raw: RawPayload): string {
 function resolvePublicationUrl(raw: RawPayload): string | undefined {
   const candidates = [
     raw.linkPublicacion,
+    raw.LinkPublicacion,
     raw.publicationUrl,
     raw.productUrl,
     raw.urlPublicacion,
     raw.url,
     raw.permalink,
+  ];
+
+  for (const candidate of candidates) {
+    if (typeof candidate === 'string' && candidate.trim()) {
+      return candidate.trim();
+    }
+  }
+
+  return undefined;
+}
+
+function resolveExternalId(raw: RawPayload): string | undefined {
+  const candidates = [
+    raw.externalId,
+    raw.external_id,
+    raw.idExterno,
+  ];
+
+  for (const candidate of candidates) {
+    if (
+      (typeof candidate === 'string' && candidate.trim()) ||
+      typeof candidate === 'number'
+    ) {
+      return String(candidate).trim();
+    }
+  }
+
+  return undefined;
+}
+
+function resolveLastSeenAt(raw: RawPayload): string | undefined {
+  const candidates = [
+    raw.lastSeenAt,
+    raw.last_seen_at,
+    raw.updatedAt,
+    raw.updated_at,
   ];
 
   for (const candidate of candidates) {
@@ -124,14 +164,39 @@ function resolveImages(raw: RawPayload): string[] {
 }
 
 function mapStatus(status: string): MarketplaceProduct['status'] {
-  switch (status) {
-    case 'Activo':
+  switch (resolveRawStatus(status)?.toUpperCase()) {
+    case 'ACTIVO':
     case 'ACTIVE':
       return 'ACTIVE';
+    case 'PENDING':
+    case 'Pendiente':
+    case 'PENDIENTE':
+    case 'Pendiente_Activacion':
+    case 'PENDIENTE_ACTIVACION':
+      return 'PENDING';
     case 'Pausado':
     case 'PAUSED':
       return 'PAUSED';
     default:
       return 'DELETED';
   }
+}
+
+function resolveRawStatus(status: unknown): string | undefined {
+  if (typeof status === 'string' && status.trim()) {
+    return status.trim();
+  }
+
+  if (status && typeof status === 'object') {
+    const value = status as Record<string, unknown>;
+    const candidates = [value.code, value.message, value.status, value.state];
+
+    for (const candidate of candidates) {
+      if (typeof candidate === 'string' && candidate.trim()) {
+        return candidate.trim();
+      }
+    }
+  }
+
+  return undefined;
 }

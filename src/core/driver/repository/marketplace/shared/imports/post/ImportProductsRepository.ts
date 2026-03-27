@@ -1,6 +1,7 @@
 import { HttpClient } from '../../../../http/httpClient';
 
 export type ImportProductsStatus =
+  | 'QUEUED'
   | 'STARTED'
   | 'SUCCESS'
   | 'FAILED';
@@ -21,7 +22,7 @@ export class ImportProductsRepository {
   }
 
   async execute(params: {
-    marketplace: 'megatone' | 'oncity';
+    marketplace: 'megatone' | 'oncity' | 'fravega';
   }): Promise<ImportProductsResponse> {
     const { marketplace } = params;
 

@@ -1,11 +1,11 @@
 import { IGetOncityProductsStatusRepository } from '@/src/core/adapters/repository/marketplace/oncity/products/status/IGetOncityProductsStatusRepository';
-import { MarketplaceProductsStatus } from '@/src/core/entitis/marketplace/shared/products/status/MarketplaceProductsStatus';
+import {
+  MarketplaceProductsStatus,
+  MarketplaceProductsStatusSummary,
+} from '@/src/core/entitis/marketplace/shared/products/status/MarketplaceProductsStatus';
 import { HttpClient } from '../../../../http/httpClient';
 
-type ApiResponse = Array<{
-  status: string;
-  total: string;
-}>;
+type ApiResponse = MarketplaceProductsStatusSummary;
 
 export class StatusOncityProductRepository
   implements IGetOncityProductsStatusRepository
@@ -21,15 +21,16 @@ export class StatusOncityProductRepository
   }
 
   async execute(params?: {
-    status?: 'ACTIVE' | 'PAUSED' | 'DELETED';
+    status?: 'ACTIVE' | 'PAUSED' | 'PENDING' | 'DELETED';
   }): Promise<MarketplaceProductsStatus[]> {
     const response = await this.http.get<ApiResponse>(
       `/api/internal/marketplace/products/oncity/status`
     );
 
-    const mapped = response.map(item => ({
+    const mapped = (response.statuses ?? []).map(item => ({
       status: item.status as MarketplaceProductsStatus['status'],
       total: Number(item.total),
+      percentage: Number(item.percentage ?? 0),
     }));
 
     if (params?.status) {

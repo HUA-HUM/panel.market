@@ -5,7 +5,7 @@ import { runImportProductsAction, RunImportStatus } from './actions/runImportPro
 
 
 type Params = {
-  marketplace: 'megatone' | 'oncity';
+  marketplace: 'megatone' | 'oncity' | 'fravega';
 };
 
 export function useRunImportProducts({ marketplace }: Params) {
@@ -25,7 +25,7 @@ export function useRunImportProducts({ marketplace }: Params) {
       });
 
       setStatus(response.status);
-    } catch (err) {
+    } catch {
       setStatus('FAILED');
       setError('Error ejecutando el import');
     } finally {
@@ -38,6 +38,6 @@ export function useRunImportProducts({ marketplace }: Params) {
     status,
     loading,
     error,
-    isRunning: loading || status === 'STARTED',
+    isRunning: loading || status === 'STARTED' || status === 'QUEUED',
   };
 }

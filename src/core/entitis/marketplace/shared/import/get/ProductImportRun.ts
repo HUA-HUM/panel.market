@@ -1,4 +1,5 @@
 export type ProductImportRunStatus =
+  | 'QUEUED'
   | 'STARTED'
   | 'RUNNING'
   | 'SUCCESS'
