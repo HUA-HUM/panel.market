@@ -16,10 +16,20 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Lo Quiero ACA",
   description: "Marketplace operations console",
+  applicationName: 'Lo Quiero ACA',
+  manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'LQA Panel',
+  },
   icons: {
-    icon: "/panel-icon.svg",
-    shortcut: "/panel-icon.svg",
-    apple: "/panel-icon.svg",
+    icon: [
+      { url: '/icons/192', sizes: '192x192', type: 'image/png' },
+      { url: '/icons/512', sizes: '512x512', type: 'image/png' },
+    ],
+    shortcut: '/icons/192',
+    apple: [{ url: '/icons/192', sizes: '192x192', type: 'image/png' }],
   },
 };
 
