@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import Sidebar from '@/src/components/layout/Sidebar';
 import { usePathname } from 'next/navigation';
 
@@ -11,6 +12,10 @@ export default function AdminLayout({
   const pathname = usePathname();
 
   const hideSidebar = pathname.startsWith('/admin/commerce');
+
+  useEffect(() => {
+    document.title = getAdminDocumentTitle(pathname);
+  }, [pathname]);
 
   return (
     <div className="flex min-h-screen bg-[linear-gradient(180deg,#050814,#0a1020_38%,#0d1424)]">
@@ -26,4 +31,77 @@ export default function AdminLayout({
       </main>
     </div>
   );
+}
+
+function getAdminDocumentTitle(pathname: string) {
+  const segments = pathname.split('/').filter(Boolean);
+
+  if (segments[0] !== 'admin') {
+    return 'Lo Quiero ACA';
+  }
+
+  if (segments.length === 1) {
+    return 'Admin Overview | Lo Quiero ACA';
+  }
+
+  const [, section, subsection, detail] = segments;
+
+  if (section === 'marketplace') {
+    if (subsection) {
+      return `Marketplace / ${getMarketplaceLabel(subsection)} | Lo Quiero ACA`;
+    }
+
+    return 'Marketplace | Lo Quiero ACA';
+  }
+
+  if (section === 'products') {
+    return 'Products | Lo Quiero ACA';
+  }
+
+  if (section === 'orders') {
+    return 'Orders | Lo Quiero ACA';
+  }
+
+  if (section === 'publish') {
+    return 'Publisher | Lo Quiero ACA';
+  }
+
+  if (section === 'commerce') {
+    if (subsection === 'analytics' && detail === 'all-products') {
+      return 'Commerce / Analytics / Products | Lo Quiero ACA';
+    }
+
+    if (subsection === 'analytics') {
+      return 'Commerce / Analytics | Lo Quiero ACA';
+    }
+
+    if (subsection === 'favorites') {
+      return 'Commerce / Favorites | Lo Quiero ACA';
+    }
+
+    return 'Commerce | Lo Quiero ACA';
+  }
+
+  return `${formatSegment(section)} | Lo Quiero ACA`;
+}
+
+function getMarketplaceLabel(marketplaceId: string) {
+  switch (marketplaceId) {
+    case 'fravega':
+      return 'Frávega';
+    case 'megatone':
+      return 'Megatone';
+    case 'oncity':
+      return 'Oncity';
+    default:
+      return formatSegment(marketplaceId);
+  }
+}
+
+function formatSegment(segment: string) {
+  return segment
+    .split('-')
+    .filter(Boolean)
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 }
