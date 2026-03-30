@@ -1,6 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import { FormEvent, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { useAuth } from '@/src/features/auth/components/AuthProvider';
+import { AuthScreenLoader } from '@/src/features/auth/components/AuthScreenLoader';
 
 const markets = [
   { name: "Fravega", file: "fravega.png", width: 132, angle: 8 },
@@ -12,6 +17,64 @@ const markets = [
 const RADIUS = 170;
 
 export default function Home() {
+  const router = useRouter();
+  const { isAuthenticated, isLoading, login } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.replace('/admin');
+    }
+  }, [isAuthenticated, isLoading, router]);
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      await login({
+        email,
+        password,
+      });
+      setRedirecting(true);
+      toast.success('Sesion iniciada correctamente.');
+      router.push('/admin');
+    } catch (submitError) {
+      const message =
+        submitError instanceof Error
+          ? submitError.message
+          : 'No se pudo iniciar sesion.';
+
+      setError(message);
+      toast.error(message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <AuthScreenLoader
+        title="Checking your session"
+        description="We are validating your current credentials before loading the workspace."
+      />
+    );
+  }
+
+  if (redirecting) {
+    return (
+      <AuthScreenLoader
+        title="Opening admin workspace"
+        description="Your session is active. We are preparing the console and redirecting you to /admin."
+      />
+    );
+  }
+
   return (
     <div className="relative h-screen overflow-hidden bg-[linear-gradient(145deg,#070b16,#09101f,#050811)] text-white">
       <div className="pointer-events-none absolute inset-0">
@@ -140,7 +203,7 @@ export default function Home() {
                 </p>
               </div>
 
-              <form className="mt-8 flex flex-col gap-4">
+              <form className="mt-8 flex flex-col gap-4" onSubmit={handleSubmit}>
                 <div className="flex flex-col gap-2">
                   <label className="text-[11px] font-medium uppercase tracking-[0.18em] text-zinc-500">
                     Email
@@ -148,6 +211,10 @@ export default function Home() {
                   <input
                     type="email"
                     placeholder="user@company.com"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    autoComplete="email"
+                    required
                     className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-cyan-400/40 focus:ring-2 focus:ring-cyan-400/20"
                   />
                 </div>
@@ -159,15 +226,26 @@ export default function Home() {
                   <input
                     type="password"
                     placeholder="••••••••"
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    autoComplete="current-password"
+                    required
                     className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-cyan-400/40 focus:ring-2 focus:ring-cyan-400/20"
                   />
                 </div>
 
+                {error && (
+                  <div className="rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+                    {error}
+                  </div>
+                )}
+
                 <button
                   type="submit"
+                  disabled={submitting}
                   className="mt-2 inline-flex items-center justify-center rounded-2xl border border-cyan-300/20 bg-[linear-gradient(135deg,#67e8f9,#2563eb,#0f172a)] px-6 py-3.5 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(37,99,235,0.35)] transition duration-200 hover:scale-[1.01] hover:shadow-[0_22px_50px_rgba(37,99,235,0.4)]"
                 >
-                  Enter
+                  {submitting ? 'Signing in...' : 'Enter'}
                 </button>
               </form>
 

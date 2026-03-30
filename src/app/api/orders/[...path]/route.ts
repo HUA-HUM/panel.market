@@ -26,6 +26,9 @@ export async function GET(
     method: 'GET',
     headers: {
       Accept: request.headers.get('accept') ?? '*/*',
+      ...(request.headers.get('authorization')
+        ? { Authorization: request.headers.get('authorization') as string }
+        : {}),
     },
     cache: 'no-store',
   });

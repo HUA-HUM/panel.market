@@ -2,7 +2,8 @@
 
 import { useEffect } from 'react';
 import Sidebar from '@/src/components/layout/Sidebar';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useAuth } from '@/src/features/auth/components/AuthProvider';
 
 export default function AdminLayout({
   children,
@@ -10,12 +11,32 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { isAuthenticated, isLoading } = useAuth();
 
   const hideSidebar = pathname.startsWith('/admin/commerce');
 
   useEffect(() => {
     document.title = getAdminDocumentTitle(pathname);
   }, [pathname]);
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.replace('/');
+    }
+  }, [isAuthenticated, isLoading, router]);
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,#050814,#0a1020_38%,#0d1424)] px-6 text-sm text-zinc-400">
+        Restoring your session...
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="flex min-h-screen bg-[linear-gradient(180deg,#050814,#0a1020_38%,#0d1424)]">

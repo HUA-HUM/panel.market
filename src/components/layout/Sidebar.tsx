@@ -2,13 +2,17 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useAuth } from '@/src/features/auth/components/AuthProvider';
+import { ConfirmLogoutModal } from '@/src/features/auth/components/ConfirmLogoutModal';
 
 export default function Sidebar() {
 
   const rawPathname = usePathname();
   const pathname = rawPathname?.replace(/\/$/, '') || '';
+  const router = useRouter();
+  const { user, logout } = useAuth();
 
   const hideSidebar = pathname.startsWith('/admin/commerce');
   const isAnalyticsRoot =
@@ -16,7 +20,21 @@ export default function Sidebar() {
     pathname === '/admin/commerce/favorites';
 
   const [manualCollapsed, setManualCollapsed] = useState(false);
+  const [logoutModalOpen, setLogoutModalOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const collapsed = isAnalyticsRoot || manualCollapsed;
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+
+    try {
+      await logout();
+      router.replace('/');
+    } finally {
+      setIsLoggingOut(false);
+      setLogoutModalOpen(false);
+    }
+  };
 
   if (hideSidebar) return null;
 
@@ -27,6 +45,12 @@ export default function Sidebar() {
         ${collapsed ? 'w-16' : 'w-72'}
       `}
     >
+      <ConfirmLogoutModal
+        open={logoutModalOpen}
+        loading={isLoggingOut}
+        onClose={() => setLogoutModalOpen(false)}
+        onConfirm={handleLogout}
+      />
       <aside
         className={`
           fixed left-0 top-0 z-40 flex h-screen flex-col overflow-hidden
@@ -85,6 +109,13 @@ export default function Sidebar() {
 
           <nav className="space-y-2 text-sm">
             <SidebarLink
+              href="/admin"
+              label="Overview"
+              icon={<HomeIcon />}
+              active={pathname === '/admin'}
+              collapsed={collapsed}
+            />
+            <SidebarLink
               href="/admin/marketplace"
               label="Marketplace"
               icon={<GridIcon />}
@@ -125,11 +156,28 @@ export default function Sidebar() {
 
         {!collapsed && (
           <div className="relative border-t border-white/10 px-4 py-4">
-            <div className="rounded-2xl border border-cyan-300/10 bg-cyan-300/10 px-4 py-3">
-              <p className="text-[11px] uppercase tracking-[0.2em] text-cyan-100/70">
-                Workspace
-              </p>
-              <p className="mt-1 text-sm font-medium text-white">Admin Console</p>
+            <div className="flex items-center justify-between gap-3 rounded-[22px] border border-cyan-300/10 bg-cyan-300/10 px-4 py-3">
+              <div className="flex min-w-0 items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-black/20 text-sm font-semibold text-cyan-100">
+                  {(user?.name ?? 'A').slice(0, 1).toUpperCase()}
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-white">
+                    {user?.name ?? 'Admin Console'}
+                  </p>
+                  <p className="truncate text-xs text-cyan-50/70">
+                    {user?.role ?? 'guest'}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setLogoutModalOpen(true)}
+                className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-xs font-medium text-zinc-200 transition hover:border-white/20 hover:bg-black/30 hover:text-white"
+              >
+                Logout
+              </button>
             </div>
           </div>
         )}
@@ -215,6 +263,16 @@ function GridIcon() {
   );
 }
 
+function HomeIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M3 10.5 12 3l9 7.5" />
+      <path d="M5 9.5V21h14V9.5" />
+      <path d="M9 21v-6h6v6" />
+    </svg>
+  );
+}
+
 function BoxIcon() {
   return (
     <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -238,7 +296,7 @@ function ClipboardIcon() {
     <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
       <path d="M9 5h6" />
       <path d="M9 3h6a2 2 0 0 1 2 2v1h2v15H5V6h2V5a2 2 0 0 1 2-2Z" />
-      <path d="M9 11h6M9 15h6" />
+      <path d="M9 10h6M9 14h6M9 18h4" />
     </svg>
   );
 }
@@ -246,28 +304,25 @@ function ClipboardIcon() {
 function LaunchIcon() {
   return (
     <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-      <path d="M7 17 17 7" />
-      <path d="M8 7h9v9" />
-      <path d="M7 7h4M17 13v4H7V7" />
+      <path d="M14 5h5v5" />
+      <path d="M10 14 19 5" />
+      <path d="M19 13v5a1 1 0 0 1-1 1h-5" />
+      <path d="M11 5H6a1 1 0 0 0-1 1v5" />
+      <path d="M5 19l6-6" />
     </svg>
   );
 }
 
-
-/* ================= CHEVRON ================= */
-
 function ChevronIcon({ collapsed }: { collapsed: boolean }) {
   return (
     <svg
-      className={`h-4 w-4 transition-transform duration-300 ${
-        collapsed ? 'rotate-180' : ''
-      }`}
+      className={`h-4 w-4 transition-transform ${collapsed ? 'rotate-180' : ''}`}
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="1.8"
     >
-      <path d="M15 6l-6 6 6 6" />
+      <path d="m15 18-6-6 6-6" />
     </svg>
   );
 }
