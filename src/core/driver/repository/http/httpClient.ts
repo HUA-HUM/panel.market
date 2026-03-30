@@ -1,4 +1,5 @@
 import { HttpError } from "./error/errors";
+import { fetchWithAuth } from '@/src/features/auth/lib/authSession';
 
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -36,7 +37,7 @@ private async request<T>(
     headers['Content-Type'] = 'application/json';
   }
 
-  const res = await fetch(url, {
+  const res = await fetchWithAuth(url, {
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,

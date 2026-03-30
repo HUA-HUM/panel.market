@@ -1,8 +1,10 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useOrdersDashboard } from '@/src/features/products/hooks/useOrdersDashboard';
 import { OrderMarketplace } from '@/src/core/adapters/repository/apiOrders/shared/order.types';
+import { useAuth } from '@/src/features/auth/components/AuthProvider';
 
 const MARKETPLACE_META = {
   fravega: {
@@ -49,6 +51,7 @@ function formatDate(value: string) {
 
 export default function AdminOverviewPage() {
   const { data, loading, error } = useOrdersDashboard();
+  const { user } = useAuth();
 
   return (
     <div className="min-h-screen w-full px-6 py-8 md:px-8 md:py-10">
@@ -76,6 +79,31 @@ export default function AdminOverviewPage() {
         {error && (
           <section className="rounded-[22px] border border-red-500/20 bg-red-500/10 px-5 py-4 text-sm text-red-100">
             {error}
+          </section>
+        )}
+
+        {user?.role === 'admin' && (
+          <section className="rounded-[28px] border border-white/10 bg-[linear-gradient(135deg,rgba(103,232,249,0.12),rgba(37,99,235,0.18),rgba(15,23,42,0.9))] p-6 shadow-[0_24px_70px_rgba(0,0,0,0.28)]">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.22em] text-cyan-100/70">
+                  Admin Access
+                </p>
+                <h2 className="mt-2 text-2xl font-semibold text-white">
+                  User management
+                </h2>
+                <p className="mt-2 max-w-2xl text-sm text-zinc-300">
+                  Create panel users from a dedicated section with roles and active state.
+                </p>
+              </div>
+
+              <Link
+                href="/admin/users"
+                className="inline-flex items-center justify-center rounded-2xl border border-cyan-300/20 bg-[linear-gradient(135deg,#67e8f9,#2563eb,#0f172a)] px-5 py-3 text-sm font-semibold text-white transition hover:brightness-110"
+              >
+                Open users
+              </Link>
+            </div>
           </section>
         )}
 

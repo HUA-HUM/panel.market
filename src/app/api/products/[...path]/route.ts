@@ -31,6 +31,9 @@ async function proxyRequest(
     method,
     headers: {
       Accept: request.headers.get('accept') ?? '*/*',
+      ...(request.headers.get('authorization')
+        ? { Authorization: request.headers.get('authorization') as string }
+        : {}),
       ...(method !== 'GET' && request.headers.get('content-type')
         ? { 'Content-Type': request.headers.get('content-type') as string }
         : {}),
