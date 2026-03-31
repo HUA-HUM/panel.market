@@ -73,6 +73,11 @@ export function ImportProductsProgress({ run }: Props) {
         <div className="text-xs text-zinc-400">
           Progress: {progress}%
         </div>
+        {isRunning && (
+          <div className="text-xs leading-5 text-zinc-500">
+            Running asynchronously with smaller processing batches. Results may appear progressively instead of immediately.
+          </div>
+        )}
       </div>
       <div className="grid grid-cols-3 gap-4 text-center">
         <Stat
