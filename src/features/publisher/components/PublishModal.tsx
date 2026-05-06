@@ -1,26 +1,21 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { useDeferredValue, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { useFolders } from '../hook/useFolders';
+import { MARKETPLACES as AVAILABLE_MARKETPLACES } from '@/src/features/marketplace/config/marketplaces';
 import {
   ExecutePublicationsResponse,
   useExecutePublications
 } from '../hook/useExecutePublications';
 
-const MARKETPLACES = [
-  {
-    id: 'megatone',
-    label: 'Megatone',
-    logo: '/marketplace/Megatone.svg'
-  },
-  {
-    id: 'fravega',
-    label: 'Frávega',
-    logo: '/marketplace/fravega.png'
-  }
-];
+const MARKETPLACES = AVAILABLE_MARKETPLACES.map((marketplace) => ({
+  id: marketplace.id,
+  label: marketplace.name,
+  logo: marketplace.logo,
+  logoWidth: marketplace.id === 'oncity' ? 72 : marketplace.id === 'megatone' ? 76 : 68,
+}));
 
 type PublishPanelProps = {
   onRunCreated?: (runId: string) => void;
@@ -46,6 +41,54 @@ function SummaryRow({
   );
 }
 
+function InfoTile({
+  eyebrow,
+  value,
+  helper
+}: {
+  eyebrow: string;
+  value: string;
+  helper: string;
+}) {
+  return (
+    <div className="rounded-[22px] border border-white/10 bg-white/[0.04] p-4">
+      <p className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{eyebrow}</p>
+      <p className="mt-3 text-lg font-semibold text-white">{value}</p>
+      <p className="mt-1 text-sm text-zinc-400">{helper}</p>
+    </div>
+  );
+}
+
+function SelectionChip({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-xs text-zinc-200">
+      {children}
+    </span>
+  );
+}
+
+function StepHeader({
+  step,
+  title,
+  description
+}: {
+  step: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="flex items-start gap-4">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-cyan-300/20 bg-cyan-300/10 text-sm font-semibold text-cyan-100">
+        {step}
+      </div>
+      <div>
+        <p className="text-base font-semibold text-white">{title}</p>
+        <p className="mt-1 text-sm leading-6 text-zinc-400">{description}</p>
+      </div>
+    </div>
+  );
+}
+
 export function PublishPanel({ onRunCreated, onLaunchStarted }: PublishPanelProps) {
   const {
     folders,
@@ -62,6 +105,8 @@ export function PublishPanel({ onRunCreated, onLaunchStarted }: PublishPanelProp
   const [result, setResult] = useState<ExecutePublicationsResponse | null>(null);
   const [launchInBackground, setLaunchInBackground] = useState(false);
   const [uiSubmitting, setUiSubmitting] = useState(false);
+  const [folderQuery, setFolderQuery] = useState('');
+  const deferredFolderQuery = useDeferredValue(folderQuery);
   const selectedFolderName =
     folders.find((folder) => folder.id === selectedFolder)?.name ?? null;
   const selectedMarketplaceLabels = MARKETPLACES
@@ -79,6 +124,18 @@ export function PublishPanel({ onRunCreated, onLaunchStarted }: PublishPanelProp
 
   const isSubmitDisabled =
     uiSubmitting || loadingFolders || !selectedFolder || selectedMarketplaces.length === 0;
+  const selectedCount = selectedMarketplaces.length;
+  const normalizedFolderQuery = deferredFolderQuery.trim().toLowerCase();
+  const visibleFolders = normalizedFolderQuery
+    ? folders.filter((folder) =>
+        folder.name.toLowerCase().includes(normalizedFolderQuery),
+      )
+    : folders;
+  const launchButtonLabel = uiSubmitting || loading
+    ? 'Launching run...'
+    : launchInBackground
+      ? 'Run started in background'
+      : 'Launch Publication Run';
 
   useEffect(() => {
     return () => {
@@ -190,26 +247,41 @@ export function PublishPanel({ onRunCreated, onLaunchStarted }: PublishPanelProp
         </div>
 
         <div className="relative space-y-6">
-          <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-            <div className="space-y-4">
+          <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+            <div className="space-y-5">
               <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/15 bg-cyan-300/10 px-3 py-1 text-[11px] uppercase tracking-[0.24em] text-cyan-100">
                 Publication Run
               </div>
 
               <div className="max-w-3xl space-y-3">
                 <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">
-                  Create a publication run in two quick steps.
+                  Build the run in a simple 2-step flow.
                 </h2>
                 <p className="max-w-2xl text-sm leading-6 text-zinc-300 md:text-base">
-                  Choose a folder, pick the marketplaces, and launch the run. The progress view will handle the monitoring afterwards.
+                  Choose one saved folder, select the marketplaces, and launch. Once the run starts, the Runs and Jobs tabs take over the tracking.
                 </p>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                <SelectionChip>
+                  {selectedFolderName ? `Folder: ${selectedFolderName}` : 'No folder selected'}
+                </SelectionChip>
+                <SelectionChip>
+                  {selectedCount > 0 ? `${selectedCount} marketplace${selectedCount > 1 ? 's' : ''} selected` : 'No marketplaces selected'}
+                </SelectionChip>
+                <SelectionChip>{statusMessage}</SelectionChip>
               </div>
             </div>
 
             <div className="rounded-[24px] border border-white/10 bg-white/[0.04] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
-              <p className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">
-                Current Summary
-              </p>
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">
+                  Current Summary
+                </p>
+                <span className="rounded-full border border-white/10 bg-black/20 px-2.5 py-1 text-[11px] uppercase tracking-[0.18em] text-zinc-300">
+                  {selectedCount > 0 && selectedFolderName ? 'Ready' : 'Pending'}
+                </span>
+              </div>
               <div className="mt-4 space-y-4">
                 <SummaryRow
                   label="Folder"
@@ -225,17 +297,39 @@ export function PublishPanel({ onRunCreated, onLaunchStarted }: PublishPanelProp
                 />
                 <SummaryRow label="Status" value={statusMessage} />
               </div>
+              <div className="mt-5 rounded-2xl border border-white/8 bg-black/20 p-4 text-sm text-zinc-400">
+                {selectedFolderName && selectedMarketplaceLabels.length
+                  ? `This run will publish ${selectedFolderName} to ${selectedMarketplaceLabels.join(', ')}.`
+                  : 'Complete the two steps below and the launch button will be ready.'}
+              </div>
             </div>
           </section>
 
-          <section className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-            <div className="rounded-[24px] border border-white/10 bg-black/20 p-5">
-              <label className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">
-                1. Source Folder
-              </label>
-              <p className="mt-2 text-sm text-zinc-400">
-                Select the product collection you want to publish.
-              </p>
+          <section className="grid gap-4 xl:grid-cols-3">
+            <InfoTile
+              eyebrow="Step 1"
+              value={selectedFolderName ?? 'Pick a folder'}
+              helper="The source collection used for this publication run."
+            />
+            <InfoTile
+              eyebrow="Step 2"
+              value={selectedMarketplaceLabels.length ? selectedMarketplaceLabels.join(', ') : 'Choose marketplaces'}
+              helper="One or more destinations can be selected at the same time."
+            />
+            <InfoTile
+              eyebrow="Launch status"
+              value={statusMessage}
+              helper="Long launches can continue in background while the backend prepares jobs."
+            />
+          </section>
+
+          <section className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
+            <div className="rounded-[24px] border border-white/10 bg-black/20 p-5 md:p-6">
+              <StepHeader
+                step="1"
+                title="Source folder"
+                description="Pick the saved collection you want to publish in this run. This selector is custom so it looks the same on Mac and Windows."
+              />
 
               <div className="mt-5">
                 {loadingFolders ? (
@@ -243,32 +337,76 @@ export function PublishPanel({ onRunCreated, onLaunchStarted }: PublishPanelProp
                     Loading available folders...
                   </div>
                 ) : (
-                  <div className="relative">
-                    <select
-                      className="
-                        w-full appearance-none rounded-2xl border border-white/10
-                        bg-white/[0.04] px-4 py-4 text-sm text-white
-                        outline-none transition
-                        focus:border-cyan-400/40 focus:ring-2 focus:ring-cyan-400/20
-                      "
-                      value={selectedFolder ?? ''}
-                      onChange={(e) => {
-                        const nextValue = e.target.value ? Number(e.target.value) : null;
-                        setValidationMessage(null);
-                        setResult(null);
-                        setSelectedFolder(nextValue);
-                      }}
-                    >
-                      <option value="">Select a folder</option>
-                      {folders.map((folder) => (
-                        <option key={folder.id} value={folder.id}>
-                          {folder.name}
-                        </option>
-                      ))}
-                    </select>
+                  <div className="space-y-4">
+                    <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3">
+                      <label className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+                        Search folder
+                      </label>
+                      <input
+                        type="text"
+                        value={folderQuery}
+                        onChange={(event) => setFolderQuery(event.target.value)}
+                        placeholder="Type a folder name..."
+                        className="mt-2 w-full bg-transparent text-sm text-white outline-none placeholder:text-zinc-600"
+                      />
+                      <p className="mt-2 text-xs text-zinc-500">
+                        {visibleFolders.length} folder{visibleFolders.length === 1 ? '' : 's'} available
+                      </p>
+                    </div>
 
-                    <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">
-                      ▼
+                    <div className="rounded-2xl border border-white/10 bg-[#0a0f1c] p-2">
+                      <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
+                        {visibleFolders.map((folder) => {
+                          const selected = selectedFolder === folder.id;
+
+                          return (
+                            <button
+                              key={folder.id}
+                              type="button"
+                              onClick={() => {
+                                setValidationMessage(null);
+                                setResult(null);
+                                setSelectedFolder(folder.id);
+                              }}
+                              className={`
+                                flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left transition
+                                ${
+                                  selected
+                                    ? 'border-cyan-400/35 bg-cyan-400/10 text-white shadow-[0_12px_30px_rgba(34,211,238,0.10)]'
+                                    : 'border-white/8 bg-white/[0.03] text-zinc-300 hover:border-white/16 hover:bg-white/[0.05]'
+                                }
+                              `}
+                            >
+                              <div className="min-w-0">
+                                <p className="truncate text-sm font-medium">
+                                  {folder.name}
+                                </p>
+                                <p className="mt-1 text-xs text-zinc-500">
+                                  Source folder #{folder.id}
+                                </p>
+                              </div>
+                              <div
+                                className={`
+                                  flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[11px] font-semibold
+                                  ${
+                                    selected
+                                      ? 'border-cyan-300/40 bg-cyan-300/20 text-cyan-100'
+                                      : 'border-white/10 bg-white/5 text-zinc-500'
+                                  }
+                                `}
+                              >
+                                {selected ? 'OK' : '+'}
+                              </div>
+                            </button>
+                          );
+                        })}
+
+                        {visibleFolders.length === 0 && (
+                          <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] px-4 py-6 text-sm text-zinc-500">
+                            No folders match your search.
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -286,15 +424,28 @@ export function PublishPanel({ onRunCreated, onLaunchStarted }: PublishPanelProp
                   </button>
                 </div>
               )}
+
+              {selectedFolderName && (
+                <div className="mt-4 rounded-2xl border border-cyan-300/15 bg-cyan-300/10 px-4 py-3 text-sm text-cyan-50">
+                  Selected folder: <span className="font-semibold text-white">{selectedFolderName}</span>
+                </div>
+              )}
             </div>
 
-            <div className="rounded-[24px] border border-white/10 bg-black/20 p-5">
-              <label className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">
-                2. Destination Marketplaces
-              </label>
-              <p className="mt-2 text-sm text-zinc-400">
-                Pick one or more marketplaces for this run.
-              </p>
+            <div className="rounded-[24px] border border-white/10 bg-black/20 p-5 md:p-6">
+              <StepHeader
+                step="2"
+                title="Destination marketplaces"
+                description="Choose where the folder should be published. These cards behave the same way across Mac and Windows."
+              />
+
+              {selectedMarketplaceLabels.length > 0 && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {selectedMarketplaceLabels.map((label) => (
+                    <SelectionChip key={label}>{label}</SelectionChip>
+                  ))}
+                </div>
+              )}
 
               <div className="mt-5 grid gap-4 md:grid-cols-2">
                 {MARKETPLACES.map((marketplace) => {
@@ -316,13 +467,17 @@ export function PublishPanel({ onRunCreated, onLaunchStarted }: PublishPanelProp
                     >
                       <div className="flex items-center gap-4">
                         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white p-3">
-                          <Image
-                            src={marketplace.logo}
-                            alt={marketplace.label}
-                            width={34}
-                            height={34}
-                            className="object-contain"
-                          />
+                          <div
+                            className="relative h-7"
+                            style={{ width: `${marketplace.logoWidth}px` }}
+                          >
+                            <Image
+                              src={marketplace.logo}
+                              alt={marketplace.label}
+                              fill
+                              className="object-contain"
+                            />
+                          </div>
                         </div>
 
                         <div className="min-w-0 flex-1">
@@ -330,7 +485,7 @@ export function PublishPanel({ onRunCreated, onLaunchStarted }: PublishPanelProp
                             {marketplace.label}
                           </p>
                           <p className="mt-1 text-sm text-zinc-400">
-                            {selected ? 'Selected for this run' : 'Click to include'}
+                            {selected ? 'Included in this run' : 'Click to include in the run'}
                           </p>
                         </div>
 
@@ -393,31 +548,46 @@ export function PublishPanel({ onRunCreated, onLaunchStarted }: PublishPanelProp
             </section>
           )}
 
-          <section className="flex flex-col gap-4 rounded-[24px] border border-white/8 bg-black/20 p-5 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-sm font-semibold text-white">
-                Ready to create the run
-              </p>
-              <p className="mt-1 text-sm text-zinc-400">
-                {selectedFolderName && selectedMarketplaceLabels.length
-                  ? `${selectedFolderName} will be sent to ${selectedMarketplaceLabels.join(', ')}.`
-                  : 'Complete both steps to enable execution.'}
-              </p>
-            </div>
+          <section className="rounded-[24px] border border-white/8 bg-black/20 p-5">
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+              <div className="space-y-2">
+                <p className="text-sm font-semibold text-white">
+                  Review and launch
+                </p>
+                <p className="text-sm text-zinc-400">
+                  {selectedFolderName && selectedMarketplaceLabels.length
+                    ? `${selectedFolderName} will be sent to ${selectedMarketplaceLabels.join(', ')}.`
+                    : 'Complete both steps to enable execution.'}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <SelectionChip>{selectedFolderName ?? 'Missing folder'}</SelectionChip>
+                  <SelectionChip>
+                    {selectedMarketplaceLabels.length
+                      ? selectedMarketplaceLabels.join(', ')
+                      : 'Missing marketplace'}
+                  </SelectionChip>
+                </div>
+              </div>
 
-            <button
-              onClick={handleExecute}
-              disabled={isSubmitDisabled}
-              className="
-                inline-flex min-w-[260px] items-center justify-center rounded-2xl
-                border border-cyan-300/20 bg-[linear-gradient(135deg,#67e8f9,#2563eb,#0f172a)] px-6 py-4
-                text-sm font-semibold text-white shadow-[0_18px_40px_rgba(37,99,235,0.35)]
-                transition duration-200 hover:scale-[1.01] hover:shadow-[0_22px_50px_rgba(37,99,235,0.4)]
-                disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100
-              "
-            >
-              {loading ? 'Launching run...' : 'Launch Publication Run'}
-            </button>
+              <div className="space-y-2">
+                <button
+                  onClick={handleExecute}
+                  disabled={isSubmitDisabled}
+                  className="
+                    inline-flex min-w-[280px] items-center justify-center rounded-2xl
+                    border border-cyan-300/20 bg-[linear-gradient(135deg,#67e8f9,#2563eb,#0f172a)] px-6 py-4
+                    text-sm font-semibold text-white shadow-[0_18px_40px_rgba(37,99,235,0.35)]
+                    transition duration-200 hover:scale-[1.01] hover:shadow-[0_22px_50px_rgba(37,99,235,0.4)]
+                    disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100
+                  "
+                >
+                  {launchButtonLabel}
+                </button>
+                <p className="text-xs text-zinc-500">
+                  After launch, follow the detailed progress from the Runs and Jobs tabs.
+                </p>
+              </div>
+            </div>
           </section>
         </div>
       </div>

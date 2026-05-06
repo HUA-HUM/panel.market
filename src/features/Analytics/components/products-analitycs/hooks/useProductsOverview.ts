@@ -14,7 +14,9 @@ export function useProductsOverview() {
   const execute = async (filters: ProductsFilters) => {
     try {
       setLoading(true);
+      console.log('[useProductsOverview] Request filters', filters);
       const response = await repository.execute(filters);
+      console.log('[useProductsOverview] Response overview', response);
       setData(response);
     } finally {
       setLoading(false);

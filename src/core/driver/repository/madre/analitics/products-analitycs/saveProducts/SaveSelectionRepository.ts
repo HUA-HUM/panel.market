@@ -22,12 +22,26 @@ export class SaveSelectionRepository
     success: boolean;
     totalProducts: number;
   }> {
-    return this.http.post(
+    const payload = {
+      marketplaceId,
+      filters,
+    };
+
+    console.log('[SaveSelectionRepository] POST', {
+      url: '/api/analytics/products/save-selection',
+      payload,
+    });
+
+    const response = await this.http.post<{
+      success: boolean;
+      totalProducts: number;
+    }>(
       '/api/analytics/products/save-selection',
-      {
-        marketplaceId,
-        filters,
-      }
+      payload
     );
+
+    console.log('[SaveSelectionRepository] Response', response);
+
+    return response;
   }
 }

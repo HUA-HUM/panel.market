@@ -24,6 +24,24 @@ import { BrandSelect } from './brand-select/BrandSelect';
 import { FolderSelect } from './folder-select/FolderSelect';
 import { SaveToFolderBar } from './SaveToFolderBar';
 
+const PRODUCT_STATUS_LABELS = {
+  active: 'Activo',
+  paused: 'Pausado',
+  under_review: 'En revisión',
+  closed: 'Cerrado',
+} as const;
+
+const MARKETPLACE_STATUS_LABELS = {
+  published: 'Publicado',
+  not_published: 'No publicado',
+} as const;
+
+const MARKETPLACE_LABELS = {
+  megatone: 'Megatone',
+  fravega: 'Frávega',
+  oncity: 'OnCity',
+} as const;
+
 export default function ProductsAnalyticsPanel() {
 
   /* ================= REPOSITORIES ================= */
@@ -97,6 +115,7 @@ const {
   /* ================= HANDLERS ================= */
 
   const handleApplyFilters = async () => {
+    console.log('[ProductsAnalyticsPanel] Applying product filters', filters);
     await execute(filters);
   };
 
@@ -217,16 +236,9 @@ return (
         />
 
         {/* EXCLUDE MARKETPLACES */}
-        <TextInput
-          label="Excluir marketplaces"
-          value={filters.excludeMarketplace?.join(',')}
-          placeholder="megatone,oncity"
-          onChange={(v) =>
-            updateFilter(
-              'excludeMarketplace',
-              v ? v.split(',').map((x) => x.trim()) : undefined
-            )
-          }
+        <ExcludeMarketplaceSelector
+          value={filters.excludeMarketplace}
+          onChange={(value) => updateFilter('excludeMarketplace', value)}
         />
       </div>
     </div>
@@ -357,7 +369,7 @@ function ProductStatusSelector({
   onChange,
 }: {
   value?: 'active' | 'paused' | 'closed' | 'under_review';
-  onChange: (value?: any) => void;
+  onChange: (value?: 'active' | 'paused' | 'closed' | 'under_review') => void;
 }) {
   const options = [
     { label: 'Activo', value: 'active' },
@@ -594,10 +606,7 @@ function ActiveFilters({ filters, onRemove }: ActiveFiltersProps) {
 
   if (filters.marketplaceStatus)
     items.push({
-      label:
-        filters.marketplaceStatus === 'published'
-          ? 'Marketplace: Publicado'
-          : 'Marketplace: No publicado',
+      label: `Marketplace: ${MARKETPLACE_STATUS_LABELS[filters.marketplaceStatus]}`,
       key: 'marketplaceStatus',
     });
 
@@ -615,18 +624,21 @@ function ActiveFilters({ filters, onRemove }: ActiveFiltersProps) {
 
   if (filters.status)
     items.push({
-      label: `Estado: ${filters.status}`,
+      label: `Estado: ${PRODUCT_STATUS_LABELS[filters.status]}`,
       key: 'status',
     });
 
   if (filters.excludeMarketplace?.length)
     items.push({
-      label: `Excluye: ${filters.excludeMarketplace.join(', ')}`,
+      label: `Excluye: ${filters.excludeMarketplace
+        .map((marketplace) => MARKETPLACE_LABELS[marketplace as keyof typeof MARKETPLACE_LABELS] ?? marketplace)
+        .join(', ')}`,
       key: 'excludeMarketplace',
     });
-    if (filters.matchedMarketplace)
+
+  if (filters.matchedMarketplace)
   items.push({
-    label: `Disponible en: ${filters.matchedMarketplace}`,
+    label: `Disponible en: ${MARKETPLACE_LABELS[filters.matchedMarketplace] ?? filters.matchedMarketplace}`,
     key: 'matchedMarketplace',
   });
 
@@ -690,6 +702,60 @@ function MatchedMarketplaceSelector({
             {item.label}
           </button>
         ))}
+      </div>
+    </div>
+  );
+}
+
+function ExcludeMarketplaceSelector({
+  value,
+  onChange,
+}: {
+  value?: string[];
+  onChange: (value?: string[]) => void;
+}) {
+  const options = [
+    { label: 'Megatone', value: 'megatone' },
+    { label: 'Frávega', value: 'fravega' },
+    { label: 'OnCity', value: 'oncity' },
+  ] as const;
+
+  const toggle = (marketplaceValue: (typeof options)[number]['value']) => {
+    const currentValues = value ?? [];
+    const exists = currentValues.includes(marketplaceValue);
+    const nextValues = exists
+      ? currentValues.filter((item) => item !== marketplaceValue)
+      : [...currentValues, marketplaceValue];
+
+    onChange(nextValues.length > 0 ? nextValues : undefined);
+  };
+
+  return (
+    <div className="flex flex-col justify-end h-[88px]">
+      <label className="text-sm text-zinc-400 mb-2">
+        Excluir marketplaces
+      </label>
+
+      <div className="flex flex-wrap gap-2">
+        {options.map((item) => {
+          const selected = value?.includes(item.value);
+
+          return (
+            <button
+              key={item.value}
+              type="button"
+              onClick={() => toggle(item.value)}
+              className={`px-4 py-2 rounded-xl text-sm font-medium transition-all
+                ${
+                  selected
+                    ? 'bg-zinc-200 text-zinc-950 shadow-md'
+                    : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+                }`}
+            >
+              {item.label}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

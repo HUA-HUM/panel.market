@@ -32,6 +32,15 @@ async execute(filters: ProductsFilters): Promise<ProductsOverview> {
   const queryString = params.toString();
   const finalUrl = `/api/analytics/products/overview?${queryString}`;
 
-  return this.http.get<ProductsOverview>(finalUrl);
+  console.log('[GetProductsOverviewRepository] GET', {
+    url: finalUrl,
+    filters,
+  });
+
+  const response = await this.http.get<ProductsOverview>(finalUrl);
+
+  console.log('[GetProductsOverviewRepository] Response', response);
+
+  return response;
 }
 }
