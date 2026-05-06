@@ -18,11 +18,21 @@ export function useSaveProductsFlow(
     try {
       setLoading(true);
 
+      console.log('[useSaveProductsFlow] Save flow payload', {
+        marketplaceId,
+        filters,
+      });
+
       const selectionResult =
         await saveSelectionRepo.execute(marketplaceId, filters);
 
       const segmentResult =
         await saveSegmentRepo.execute(marketplaceId, filters);
+
+      console.log('[useSaveProductsFlow] Save flow responses', {
+        selectionResult,
+        segmentResult,
+      });
 
       return {
         selectionResult,

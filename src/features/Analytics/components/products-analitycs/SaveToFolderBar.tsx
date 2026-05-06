@@ -55,7 +55,16 @@ export function SaveToFolderBar({
     try {
       setSaving(true);
 
-      await onSaveFlow(selectedFolderId, filters);
+      const requestPayload = {
+        marketplaceId: selectedFolderId,
+        filters,
+      };
+
+      console.log('[SaveToFolderBar] Saving product selection to folder', requestPayload);
+
+      const result = await onSaveFlow(selectedFolderId, filters);
+
+      console.log('[SaveToFolderBar] Save product selection response', result);
 
       toast.success("Productos guardados en la carpeta")
     } finally {

@@ -23,12 +23,27 @@ export class SaveSegmentRepository
     segmentId: number;
     totalProducts: number;
   }> {
-    return this.http.post(
+    const payload = {
+      marketplaceId,
+      filters,
+    };
+
+    console.log('[SaveSegmentRepository] POST', {
+      url: '/api/analytics/products/segments',
+      payload,
+    });
+
+    const response = await this.http.post<{
+      success: boolean;
+      segmentId: number;
+      totalProducts: number;
+    }>(
       '/api/analytics/products/segments',
-      {
-        marketplaceId,
-        filters,
-      }
+      payload
     );
+
+    console.log('[SaveSegmentRepository] Response', response);
+
+    return response;
   }
 }

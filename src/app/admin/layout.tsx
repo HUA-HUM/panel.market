@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import Sidebar from '@/src/components/layout/Sidebar';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/src/features/auth/components/AuthProvider';
+import { AuthScreenLoader } from '@/src/features/auth/components/AuthScreenLoader';
 
 export default function AdminLayout({
   children,
@@ -28,9 +29,10 @@ export default function AdminLayout({
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,#050814,#0a1020_38%,#0d1424)] px-6 text-sm text-zinc-400">
-        Restoring your session...
-      </div>
+      <AuthScreenLoader
+        title="Restoring your session"
+        description="We are verifying your access and preparing the admin workspace."
+      />
     );
   }
 
