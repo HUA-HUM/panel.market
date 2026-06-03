@@ -137,6 +137,13 @@ export default function Sidebar() {
               collapsed={collapsed}
             />
             <SidebarLink
+              href="/admin/pricing"
+              label="Pricing"
+              icon={<DollarIcon />}
+              active={pathname.startsWith('/admin/pricing')}
+              collapsed={collapsed}
+            />
+            <SidebarLink
               href="/admin/publish"
               label="Publisher"
               icon={<PulseIcon />}
@@ -297,6 +304,15 @@ function ClipboardIcon() {
       <path d="M9 5h6" />
       <path d="M9 3h6a2 2 0 0 1 2 2v1h2v15H5V6h2V5a2 2 0 0 1 2-2Z" />
       <path d="M9 10h6M9 14h6M9 18h4" />
+    </svg>
+  );
+}
+
+function DollarIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M12 3v18" />
+      <path d="M16.5 7.5c0-1.9-2-3.5-4.5-3.5S7.5 5.6 7.5 7.5 9 10.5 12 10.5s4.5 1.6 4.5 3.5-2 3.5-4.5 3.5-4.5-1.6-4.5-3.5" />
     </svg>
   );
 }

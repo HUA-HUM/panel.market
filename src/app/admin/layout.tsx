@@ -85,6 +85,10 @@ function getAdminDocumentTitle(pathname: string) {
     return 'Orders | Lo Quiero ACA';
   }
 
+  if (section === 'pricing') {
+    return 'Pricing | Lo Quiero ACA';
+  }
+
   if (section === 'publish') {
     return 'Publisher | Lo Quiero ACA';
   }
