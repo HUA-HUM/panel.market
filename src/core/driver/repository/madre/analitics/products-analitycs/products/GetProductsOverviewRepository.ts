@@ -22,10 +22,12 @@ async execute(filters: ProductsFilters): Promise<ProductsOverview> {
   Object.entries(filters).forEach(([key, value]) => {
     if (value === undefined || value === null) return;
 
+    const backendKey = key === 'inMarketplace' ? 'marketplaceId' : key;
+
     if (Array.isArray(value)) {
-      value.forEach(v => params.append(key, v));
+      value.forEach(v => params.append(backendKey, v));
     } else {
-      params.append(key, String(value));
+      params.append(backendKey, String(value));
     }
   });
 
