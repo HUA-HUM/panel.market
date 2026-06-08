@@ -25,6 +25,12 @@ export default function MarketplaceDetailClient({ marketplace }: Props) {
   const [tab, setTab] = useState<Tab>('products');
   const router = useRouter();
   const supportsImports =
+    marketplace.id === 'google-merchant' ||
+    marketplace.id === 'megatone' ||
+    marketplace.id === 'oncity' ||
+    marketplace.id === 'fravega';
+  const supportsStatus =
+    marketplace.id === 'google-merchant' ||
     marketplace.id === 'megatone' ||
     marketplace.id === 'oncity' ||
     marketplace.id === 'fravega';
@@ -137,22 +143,29 @@ export default function MarketplaceDetailClient({ marketplace }: Props) {
         {tab === 'import' && (
           supportsImports ? (
             <ImportProductsAction
-              marketplace={marketplace.id as 'megatone' | 'oncity' | 'fravega'}
+              marketplace={marketplace.id as 'google-merchant' | 'megatone' | 'oncity' | 'fravega'}
             />
           ) : (
             <MarketplaceFeaturePlaceholder
               title="Imports not available yet"
-              description="Fravega product browsing is enabled. Import runs will be connected when the marketplace workflow is ready."
+              description={`${marketplace.name} product browsing is enabled. Import runs will be connected when the marketplace workflow is ready.`}
             />
           )
         )}
 
         {tab === 'actions' && (
-          <div>
-            <MarketplaceProductsHeader
-              marketplaceId={marketplace.id}
+          supportsStatus ? (
+            <div>
+              <MarketplaceProductsHeader
+                marketplaceId={marketplace.id}
+              />
+            </div>
+          ) : (
+            <MarketplaceFeaturePlaceholder
+              title="Status summary not available yet"
+              description={`${marketplace.name} product browsing is enabled. Status distribution will be connected once the dedicated endpoint is ready.`}
             />
-          </div>
+          )
         )}
       </div>
     </div>

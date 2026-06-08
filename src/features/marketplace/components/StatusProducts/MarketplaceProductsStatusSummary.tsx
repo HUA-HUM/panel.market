@@ -166,6 +166,15 @@ function getStatusMeta(status: string) {
     };
   }
 
+  if (normalized.includes('ERROR') || normalized.includes('FAILED')) {
+    return {
+      bg: 'bg-red-500/10',
+      text: 'text-red-200',
+      border: 'border-red-400/20',
+      accent: 'from-red-300/20 to-red-500/5',
+    };
+  }
+
   return {
     bg: 'bg-white/[0.06]',
     text: 'text-zinc-100',

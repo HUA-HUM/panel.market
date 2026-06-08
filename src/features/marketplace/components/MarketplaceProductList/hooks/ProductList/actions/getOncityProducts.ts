@@ -7,6 +7,8 @@ import { GetOncityProductsRepository } from '@/src/core/driver/repository/market
 type Params = {
   offset: number;
   limit: number;
+  sku?: string;
+  status?: 'ACTIVE' | 'ERROR';
 };
 
 export async function getOncityProductsAction(params: Params) {

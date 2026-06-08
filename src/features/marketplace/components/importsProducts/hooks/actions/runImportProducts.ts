@@ -6,7 +6,7 @@ import { ImportProductsRepository } from '@/src/core/driver/repository/marketpla
 export type RunImportStatus = 'QUEUED' | 'STARTED' | 'SUCCESS' | 'FAILED';
 
 type Params = {
-  marketplace: 'megatone' | 'oncity' | 'fravega';
+  marketplace: 'google-merchant' | 'megatone' | 'oncity' | 'fravega';
 };
 
 export async function runImportProductsAction(

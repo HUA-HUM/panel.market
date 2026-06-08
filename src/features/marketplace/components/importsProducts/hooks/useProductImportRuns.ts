@@ -6,7 +6,7 @@ import { IGetProductImportRunsRepository } from '@/src/core/adapters/repository/
 import { GetProductSyncRunsRepository } from '@/src/core/driver/repository/marketplace/shared/imports/get/GetProductImportRunsRepository';
 
 type Params = {
-  marketplace: 'megatone' | 'oncity' | 'fravega';
+  marketplace: 'google-merchant' | 'megatone' | 'oncity' | 'fravega';
 };
 
 export function useProductImportRuns({ marketplace }: Params) {

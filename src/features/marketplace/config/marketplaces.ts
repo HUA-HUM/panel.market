@@ -7,6 +7,12 @@ export type Marketplace = {
 
 export const MARKETPLACES: Marketplace[] = [
   {
+    id: 'google-merchant',
+    name: 'Google Merchant',
+    description: 'Feed validation y publicación en Merchant Center',
+    logo: '/marketplace/google-merchant.png',
+  },
+  {
     id: 'fravega',
     name: 'Frávega',
     description: 'Gestión de catálogo y precios',

@@ -8,6 +8,8 @@ import { GetMegatoneProductsRepository } from '@/src/core/driver/repository/mark
 type Params = {
   offset: number;
   limit: number;
+  sku?: string;
+  status?: 'ACTIVE' | 'ERROR';
 };
 
 export async function getMegatoneProductsAction(

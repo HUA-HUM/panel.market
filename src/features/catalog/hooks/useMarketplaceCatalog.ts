@@ -8,10 +8,18 @@ import { GetMarketplaceProductBySkuRepository } from '@/src/core/driver/reposito
 import { GetMarketplaceProductsRepository } from '@/src/core/driver/repository/madre/products/GetMarketplaceProductsRepository';
 
 const PAGE_SIZE = 10;
+type MarketplaceCatalogStatusFilter = 'ACTIVE' | 'ERROR';
 
 export function useMarketplaceCatalog() {
   const [items, setItems] = useState<MarketplaceProductPresence[]>([]);
   const [selectedSku, setSelectedSku] = useState('');
+  const [filterSku, setFilterSku] = useState('');
+  const [filterStatus, setFilterStatus] =
+    useState<MarketplaceCatalogStatusFilter | ''>('');
+  const [appliedFilters, setAppliedFilters] = useState<{
+    sku?: string;
+    status?: MarketplaceCatalogStatusFilter;
+  }>({});
   const [selectedProduct, setSelectedProduct] = useState<MarketplaceProductPresence | null>(null);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -31,6 +39,8 @@ export function useMarketplaceCatalog() {
       const response = await repository.execute({
         offset,
         limit: PAGE_SIZE,
+        sku: appliedFilters.sku,
+        status: appliedFilters.status,
       });
 
       setItems(response.items);
@@ -46,7 +56,7 @@ export function useMarketplaceCatalog() {
     } finally {
       setLoading(false);
     }
-  }, [selectedSku]);
+  }, [selectedSku, appliedFilters]);
 
   const fetchProduct = useCallback(async (sellerSku: string) => {
     const normalizedSku = sellerSku.trim();
@@ -84,9 +94,25 @@ export function useMarketplaceCatalog() {
     }, {});
   }, [items]);
 
+  const applyFilters = useCallback(() => {
+    setAppliedFilters({
+      sku: filterSku.trim() || undefined,
+      status: filterStatus || undefined,
+    });
+  }, [filterSku, filterStatus]);
+
+  const clearFilters = useCallback(() => {
+    setFilterSku('');
+    setFilterStatus('');
+    setAppliedFilters({});
+  }, []);
+
   return {
     items,
     selectedSku,
+    filterSku,
+    filterStatus,
+    appliedFilters,
     selectedProduct,
     page,
     total,
@@ -96,6 +122,10 @@ export function useMarketplaceCatalog() {
     error,
     marketplaceTotals,
     setSelectedSku,
+    setFilterSku,
+    setFilterStatus,
+    applyFilters,
+    clearFilters,
     fetchPage,
     fetchProduct,
     selectProductFromList: (product: MarketplaceProductPresence) => {

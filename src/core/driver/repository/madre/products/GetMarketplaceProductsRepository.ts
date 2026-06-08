@@ -27,18 +27,31 @@ export class GetMarketplaceProductsRepository
   async execute(params: {
     offset: number;
     limit: number;
+    sku?: string;
+    status?: 'ACTIVE' | 'ERROR';
   }): Promise<PaginatedMarketplaceProductsResponse> {
-    const { offset, limit } = params;
+    const query = new URLSearchParams({
+      offset: String(params.offset),
+      limit: String(params.limit),
+    });
+
+    if (params.sku?.trim()) {
+      query.set('sku', params.sku.trim());
+    }
+
+    if (params.status) {
+      query.set('status', params.status);
+    }
 
     const response = await this.http.get<MarketplaceProductsApiResponse>(
-      `/madre/internal/marketplace/products/items/marketplaces?offset=${offset}&limit=${limit}`
+      `/madre/internal/marketplace/products/items/marketplaces?${query}`
     );
 
     return {
       items: Array.isArray(response.items) ? response.items : [],
       total: response.total ?? (Array.isArray(response.items) ? response.items.length : 0),
-      limit: response.limit ?? limit,
-      offset: response.offset ?? offset,
+      limit: response.limit ?? params.limit,
+      offset: response.offset ?? params.offset,
     };
   }
 }
