@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { MarketplaceProduct } from '@/src/core/entitis/marketplace/shared/products/get/MarketplaceProduct';
 import { MarketplaceProductsListSummary } from '@/src/core/entitis/marketplace/shared/products/get/pagination/PaginatedResult';
 import { getFravegaProductsAction } from './actions/getFravegaProducts';
+import { getGoogleMerchantProductsAction } from './actions/getGoogleMerchantProducts';
 import { getMegatoneProductsAction } from './actions/getMegatoneProducts';
 import { getOncityProductsAction } from './actions/getOncityProducts';
 
@@ -11,9 +12,15 @@ const PAGE_SIZE = 10;
 
 type Params = {
   marketplaceId: string;
+  filters?: MarketplaceProductsFilters;
 };
 
-export function useMarketplaceProducts({ marketplaceId }: Params) {
+export type MarketplaceProductsFilters = {
+  sku?: string;
+  status?: 'ACTIVE' | 'ERROR';
+};
+
+export function useMarketplaceProducts({ marketplaceId, filters }: Params) {
   const [items, setItems] = useState<MarketplaceProduct[]>([]);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -28,6 +35,7 @@ export function useMarketplaceProducts({ marketplaceId }: Params) {
   const hasFetchedRef = useRef(false);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const filterKey = `${filters?.sku?.trim() ?? ''}:${filters?.status ?? ''}`;
 
   const fetchPage = useCallback(
     async (nextPage: number) => {
@@ -45,24 +53,23 @@ export function useMarketplaceProducts({ marketplaceId }: Params) {
 
       try {
         const offset = (nextPage - 1) * PAGE_SIZE;
+        const requestParams = {
+          offset,
+          limit: PAGE_SIZE,
+          sku: filters?.sku?.trim() || undefined,
+          status: filters?.status,
+        };
 
         let response;
 
         if (marketplaceId === 'fravega') {
-          response = await getFravegaProductsAction({
-            offset,
-            limit: PAGE_SIZE,
-          });
+          response = await getFravegaProductsAction(requestParams);
+        } else if (marketplaceId === 'google-merchant') {
+          response = await getGoogleMerchantProductsAction(requestParams);
         } else if (marketplaceId === 'megatone') {
-          response = await getMegatoneProductsAction({
-            offset,
-            limit: PAGE_SIZE,
-          });
+          response = await getMegatoneProductsAction(requestParams);
         } else if (marketplaceId === 'oncity') {
-          response = await getOncityProductsAction({
-            offset,
-            limit: PAGE_SIZE,
-          });
+          response = await getOncityProductsAction(requestParams);
         } else {
           throw new Error(`Marketplace no soportado: ${marketplaceId}`);
         }
@@ -78,13 +85,14 @@ export function useMarketplaceProducts({ marketplaceId }: Params) {
         setPaging(false);
       }
     },
-    [marketplaceId, page, totalPages, loading, paging]
+    [marketplaceId, page, totalPages, loading, paging, filters]
   );
 
   // carga inicial (una sola vez por marketplace)
   useEffect(() => {
     hasFetchedRef.current = false;
-  }, [marketplaceId]);
+    setPage(1);
+  }, [marketplaceId, filterKey]);
 
   useEffect(() => {
     if (hasFetchedRef.current) return;

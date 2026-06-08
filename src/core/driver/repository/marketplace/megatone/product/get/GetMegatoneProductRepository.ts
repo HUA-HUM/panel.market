@@ -50,11 +50,13 @@ export class GetMegatoneProductsRepository
 async execute(params: {
   offset: number;
   limit: number;
+  sku?: string;
+  status?: 'ACTIVE' | 'ERROR';
 }): Promise<PaginatedResult<MarketplaceProduct>> {
-  const { offset, limit } = params;
+  const query = buildProductsQuery('megatone', params);
 
   const response = await this.http.get<MegatoneApiResponse>(
-    `/api/internal/marketplace/products/items/all?marketplace=megatone&offset=${offset}&limit=${limit}`
+    `/api/internal/marketplace/products/items/all?${query}`
   );
 
   const items = response.items
@@ -86,6 +88,32 @@ async execute(params: {
       response.offset + response.limit,
   };
 }
+}
+
+function buildProductsQuery(
+  marketplace: string,
+  params: {
+    offset: number;
+    limit: number;
+    sku?: string;
+    status?: 'ACTIVE' | 'ERROR';
+  }
+) {
+  const query = new URLSearchParams({
+    marketplace,
+    offset: String(params.offset),
+    limit: String(params.limit),
+  });
+
+  if (params.sku?.trim()) {
+    query.set('sku', params.sku.trim());
+  }
+
+  if (params.status) {
+    query.set('status', params.status);
+  }
+
+  return query.toString();
 }
 
 function buildMarketplaceRawPayload(

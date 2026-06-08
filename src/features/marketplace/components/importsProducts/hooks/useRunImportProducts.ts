@@ -5,7 +5,7 @@ import { runImportProductsAction, RunImportStatus } from './actions/runImportPro
 
 
 type Params = {
-  marketplace: 'megatone' | 'oncity' | 'fravega';
+  marketplace: 'google-merchant' | 'megatone' | 'oncity' | 'fravega';
 };
 
 export function useRunImportProducts({ marketplace }: Params) {

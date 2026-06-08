@@ -6,6 +6,8 @@ import { GetFravegaProductsRepository } from '@/src/core/driver/repository/marke
 type Params = {
   offset: number;
   limit: number;
+  sku?: string;
+  status?: 'ACTIVE' | 'ERROR';
 };
 
 export async function getFravegaProductsAction(params: Params) {

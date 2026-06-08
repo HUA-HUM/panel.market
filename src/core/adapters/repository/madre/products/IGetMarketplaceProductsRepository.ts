@@ -11,5 +11,7 @@ export interface IGetMarketplaceProductsRepository {
   execute(params: {
     offset: number;
     limit: number;
+    sku?: string;
+    status?: 'ACTIVE' | 'ERROR';
   }): Promise<PaginatedMarketplaceProductsResponse>;
 }

@@ -114,6 +114,8 @@ function getAdminDocumentTitle(pathname: string) {
 
 function getMarketplaceLabel(marketplaceId: string) {
   switch (marketplaceId) {
+    case 'google-merchant':
+      return 'Google Merchant';
     case 'fravega':
       return 'Frávega';
     case 'megatone':

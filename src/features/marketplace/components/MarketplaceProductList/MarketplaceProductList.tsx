@@ -1,7 +1,11 @@
 'use client';
 
+import { FormEvent, useState } from 'react';
 import { BrandSpinner } from '@/src/components/loader/BrandSpinner';
-import { useMarketplaceProducts } from './hooks/ProductList/useMarketplaceProducts';
+import {
+  MarketplaceProductsFilters,
+  useMarketplaceProducts,
+} from './hooks/ProductList/useMarketplaceProducts';
 import { MarketplaceProductCard } from './MarketplaceProductCard';
 import { MarketplaceProductSkeleton } from './MarketplaceProductSkeleton';
 
@@ -10,6 +14,11 @@ type Props = {
 };
 
 export default function MarketplaceProductList({ marketplaceId }: Props) {
+  const [skuFilter, setSkuFilter] = useState('');
+  const [statusFilter, setStatusFilter] =
+    useState<MarketplaceProductsFilters['status'] | ''>('');
+  const [appliedFilters, setAppliedFilters] =
+    useState<MarketplaceProductsFilters>({});
   const {
     items,
     page,
@@ -22,9 +31,27 @@ export default function MarketplaceProductList({ marketplaceId }: Props) {
     fetchNext,
     fetchPrev,
     refresh,
-  } = useMarketplaceProducts({ marketplaceId });
+  } = useMarketplaceProducts({
+    marketplaceId,
+    filters: appliedFilters,
+  });
 
   const statusCards = summary?.statuses ?? [];
+  const hasAppliedFilters = Boolean(appliedFilters.sku || appliedFilters.status);
+
+  const handleApplyFilters = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setAppliedFilters({
+      sku: skuFilter.trim() || undefined,
+      status: statusFilter || undefined,
+    });
+  };
+
+  const handleClearFilters = () => {
+    setSkuFilter('');
+    setStatusFilter('');
+    setAppliedFilters({});
+  };
 
   return (
     <div className="relative space-y-6 rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.03))] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
@@ -67,6 +94,57 @@ export default function MarketplaceProductList({ marketplaceId }: Props) {
           ⟳ Refresh
         </button>
       </div>
+
+      <form
+        onSubmit={handleApplyFilters}
+        className="grid gap-3 rounded-[20px] border border-white/10 bg-black/10 p-4 md:grid-cols-[minmax(0,1fr)_180px_auto_auto]"
+      >
+        <label className="space-y-1.5">
+          <span className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+            SKU
+          </span>
+          <input
+            value={skuFilter}
+            onChange={(event) => setSkuFilter(event.target.value)}
+            placeholder="Filter by SKU"
+            className="h-11 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-cyan-300/35"
+          />
+        </label>
+
+        <label className="space-y-1.5">
+          <span className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+            Status
+          </span>
+          <select
+            value={statusFilter}
+            onChange={(event) =>
+              setStatusFilter(event.target.value as MarketplaceProductsFilters['status'] | '')
+            }
+            className="h-11 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm text-white outline-none transition focus:border-cyan-300/35"
+          >
+            <option value="">All</option>
+            <option value="ACTIVE">Active</option>
+            <option value="ERROR">Error</option>
+          </select>
+        </label>
+
+        <button
+          type="submit"
+          disabled={loading || paging}
+          className="inline-flex h-11 items-center justify-center self-end rounded-xl border border-cyan-300/20 bg-cyan-300/10 px-4 text-sm font-medium text-cyan-100 transition hover:border-cyan-300/35 disabled:opacity-40"
+        >
+          Apply
+        </button>
+
+        <button
+          type="button"
+          onClick={handleClearFilters}
+          disabled={!hasAppliedFilters || loading || paging}
+          className="inline-flex h-11 items-center justify-center self-end rounded-xl border border-white/10 bg-white/[0.04] px-4 text-sm font-medium text-zinc-300 transition hover:border-white/20 hover:text-white disabled:opacity-40"
+        >
+          Clear
+        </button>
+      </form>
 
       {statusCards.length > 0 && (
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">

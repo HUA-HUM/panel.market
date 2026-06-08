@@ -75,6 +75,9 @@ export function MarketplaceCatalogPanel() {
   const {
     items,
     selectedSku,
+    filterSku,
+    filterStatus,
+    appliedFilters,
     selectedProduct,
     page,
     total,
@@ -83,6 +86,10 @@ export function MarketplaceCatalogPanel() {
     detailLoading,
     error,
     setSelectedSku,
+    setFilterSku,
+    setFilterStatus,
+    applyFilters,
+    clearFilters,
     fetchPage,
     fetchProduct,
     selectProductFromList,
@@ -92,6 +99,13 @@ export function MarketplaceCatalogPanel() {
     event.preventDefault();
     await fetchProduct(selectedSku);
   };
+
+  const handleFilterSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    applyFilters();
+  };
+
+  const hasAppliedFilters = Boolean(appliedFilters.sku || appliedFilters.status);
 
   return (
     <div className="w-full px-6 py-10">
@@ -139,6 +153,57 @@ export function MarketplaceCatalogPanel() {
             {error}
           </section>
         )}
+
+        <form
+          onSubmit={handleFilterSubmit}
+          className="grid gap-3 rounded-[22px] border border-white/10 bg-black/20 p-4 md:grid-cols-[minmax(0,1fr)_180px_auto_auto]"
+        >
+          <label className="space-y-1.5">
+            <span className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+              SKU
+            </span>
+            <input
+              value={filterSku}
+              onChange={(event) => setFilterSku(event.target.value)}
+              placeholder="Filter list by seller SKU"
+              className="h-11 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-cyan-300/35"
+            />
+          </label>
+
+          <label className="space-y-1.5">
+            <span className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+              Status
+            </span>
+            <select
+              value={filterStatus}
+              onChange={(event) =>
+                setFilterStatus(event.target.value as typeof filterStatus)
+              }
+              className="h-11 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm text-white outline-none transition focus:border-cyan-300/35"
+            >
+              <option value="">All</option>
+              <option value="ACTIVE">Active</option>
+              <option value="ERROR">Error</option>
+            </select>
+          </label>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="inline-flex h-11 items-center justify-center self-end rounded-xl border border-cyan-300/20 bg-cyan-300/10 px-4 text-sm font-medium text-cyan-100 transition hover:border-cyan-300/35 disabled:opacity-40"
+          >
+            Apply
+          </button>
+
+          <button
+            type="button"
+            onClick={clearFilters}
+            disabled={!hasAppliedFilters || loading}
+            className="inline-flex h-11 items-center justify-center self-end rounded-xl border border-white/10 bg-white/[0.04] px-4 text-sm font-medium text-zinc-300 transition hover:border-white/20 hover:text-white disabled:opacity-40"
+          >
+            Clear
+          </button>
+        </form>
 
         <section className="grid gap-4 md:grid-cols-3">
           <SimpleStat

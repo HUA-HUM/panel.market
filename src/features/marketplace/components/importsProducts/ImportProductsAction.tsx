@@ -6,7 +6,7 @@ import { useProductImportRuns } from './hooks/useProductImportRuns';
 import { ImportProductsProgress } from './ImportProductsProgress';
 
 type Props = {
-  marketplace: 'megatone' | 'oncity' | 'fravega';
+  marketplace: 'google-merchant' | 'megatone' | 'oncity' | 'fravega';
 };
 
 export function ImportProductsAction({ marketplace }: Props) {

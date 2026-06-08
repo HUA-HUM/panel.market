@@ -5,5 +5,7 @@ export interface IGetOncityProductsRepository {
   execute(params: {
     offset: number;
     limit: number;
+    sku?: string;
+    status?: 'ACTIVE' | 'ERROR';
   }): Promise<PaginatedResult<MarketplaceProduct>>;
 }

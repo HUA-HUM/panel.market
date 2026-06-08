@@ -22,7 +22,7 @@ export class ImportProductsRepository {
   }
 
   async execute(params: {
-    marketplace: 'megatone' | 'oncity' | 'fravega';
+    marketplace: 'google-merchant' | 'megatone' | 'oncity' | 'fravega';
   }): Promise<ImportProductsResponse> {
     const { marketplace } = params;
 
